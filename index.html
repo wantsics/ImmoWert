@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ImmoWert – Ertragswertrechner</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Immobilienbewertung</p>
+        <h1>Ertragswertrechner</h1>
+        <p class="subline">Schnelle überschlägige Bewertung vermieteter Immobilien nach dem vereinfachten Ertragswertverfahren.</p>
+      </div>
+      <div class="hero-card">
+        <span>Vorläufiger Ertragswert</span>
+        <strong id="headlineValue">–</strong>
+      </div>
+    </section>
+
+    <section class="layout">
+      <form class="panel input-panel" id="valuationForm">
+        <h2>Eingaben</h2>
+
+        <div class="grid two">
+          <label>
+            Jahresrohmiete
+            <input type="number" id="grossRent" value="45000" min="0" step="500" />
+            <small>€ / Jahr, kalt</small>
+          </label>
+
+          <label>
+            Bewirtschaftungskosten
+            <input type="number" id="operatingCosts" value="9000" min="0" step="250" />
+            <small>€ / Jahr, nicht umlagefähig</small>
+          </label>
+
+          <label>
+            Bodenwert
+            <input type="number" id="landValue" value="500000" min="0" step="5000" />
+            <small>€</small>
+          </label>
+
+          <label>
+            Liegenschaftszins
+            <input type="number" id="propertyYield" value="3.5" min="0" step="0.1" />
+            <small>% p. a.</small>
+          </label>
+
+          <label>
+            Restnutzungsdauer
+            <input type="number" id="remainingLife" value="40" min="1" max="100" step="1" />
+            <small>Jahre</small>
+          </label>
+
+          <label>
+            Kaufpreis
+            <input type="number" id="purchasePrice" value="850000" min="0" step="5000" />
+            <small>€ optional</small>
+          </label>
+        </div>
+
+        <details>
+          <summary>Weitere Annahmen</summary>
+          <div class="grid two compact">
+            <label>
+              Kaufnebenkosten
+              <input type="number" id="purchaseCostsRate" value="10" min="0" step="0.1" />
+              <small>% vom Kaufpreis</small>
+            </label>
+            <label>
+              Leerstand / Risikoabschlag
+              <input type="number" id="riskDiscount" value="0" min="0" step="0.1" />
+              <small>% vom Ertragswert</small>
+            </label>
+          </div>
+        </details>
+      </form>
+
+      <section class="panel results-panel">
+        <h2>Ergebnis</h2>
+        <div class="result-list">
+          <div><span>Jahresreinertrag</span><strong id="netIncome">–</strong></div>
+          <div><span>Bodenwertverzinsung</span><strong id="landInterest">–</strong></div>
+          <div><span>Gebäudereinertrag</span><strong id="buildingIncome">–</strong></div>
+          <div><span>Vervielfältiger</span><strong id="multiplier">–</strong></div>
+          <div><span>Gebäudeertragswert</span><strong id="buildingValue">–</strong></div>
+          <div><span>Vorläufiger Ertragswert</span><strong id="incomeValue">–</strong></div>
+          <div><span>Ertragswert nach Risikoabschlag</span><strong id="riskAdjustedValue">–</strong></div>
+        </div>
+
+        <h3>Kaufpreischeck</h3>
+        <div class="result-list muted">
+          <div><span>Kaufpreis inkl. Nebenkosten</span><strong id="totalAcquisitionCost">–</strong></div>
+          <div><span>Differenz zum Ertragswert</span><strong id="valueGap">–</strong></div>
+          <div><span>Kaufpreisfaktor</span><strong id="rentMultiplier">–</strong></div>
+          <div><span>Bruttorendite</span><strong id="grossYield">–</strong></div>
+          <div><span>Nettorendite vor Finanzierung</span><strong id="netYield">–</strong></div>
+        </div>
+
+        <p class="hint" id="verdict">–</p>
+      </section>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
