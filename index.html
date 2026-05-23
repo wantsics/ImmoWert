@@ -54,14 +54,44 @@
         <h2>Bodenwert</h2>
         <div class="grid three">
           <label>
-            Bodenrichtwert
+            Aktueller Bodenrichtwert
             <input type="number" id="baseLandValuePerSqm" value="2300" min="0" step="10" />
             <small>€/m² aus BORIS / Marktbericht</small>
           </label>
           <label>
-            Zeitfaktor
-            <input type="number" id="timeAdjustmentFactor" value="0.98" min="0" step="0.01" />
-            <small>z. B. 0,98 im Referenzgutachten</small>
+            Aktuelles BRW-Jahr
+            <input type="number" id="currentBrwYear" value="2023" min="1900" max="2100" step="1" />
+            <small>Jahr/Stichtagsjahr des aktuellen BRW</small>
+          </label>
+          <label>
+            Zeitfaktor BRW
+            <input type="number" id="timeAdjustmentFactor" value="1.00" min="0" step="0.01" readonly />
+            <small>wird aus historischen BRW linear extrapoliert; ohne Historie = 1,00</small>
+          </label>
+          <label>
+            Vorjahr 1
+            <input type="number" id="historicBrwYear1" value="" min="1900" max="2100" step="1" />
+            <small>Jahr, z. B. 2022</small>
+          </label>
+          <label>
+            BRW Vorjahr 1
+            <input type="number" id="historicBrwValue1" value="" min="0" step="10" />
+            <small>€/m²</small>
+          </label>
+          <label>
+            Bewertungsjahr für Extrapolation
+            <input type="number" id="targetBrwYear" value="2024" min="1900" max="2100" step="1" />
+            <small>meist Jahr des Bewertungsstichtags</small>
+          </label>
+          <label>
+            Vorjahr 2
+            <input type="number" id="historicBrwYear2" value="" min="1900" max="2100" step="1" />
+            <small>Jahr, z. B. 2021</small>
+          </label>
+          <label>
+            BRW Vorjahr 2
+            <input type="number" id="historicBrwValue2" value="" min="0" step="10" />
+            <small>€/m²</small>
           </label>
           <label>
             WGFZ-/Lagefaktor
@@ -84,6 +114,7 @@
             <small>Anteil am angepassten BRW</small>
           </label>
         </div>
+        <p class="hint" id="brwTrendInfo">BRW-Zeitfaktor: keine Historie angegeben, daher Faktor 1,00.</p>
 
         <h2>Erträge</h2>
         <div class="grid three">
