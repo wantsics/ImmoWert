@@ -12,7 +12,7 @@
       <div>
         <p class="eyebrow">ImmoWert · MVP</p>
         <h1>Ertragswertverfahren</h1>
-        <p class="subline">Schneller, lokal laufender Ankaufrechner mit aufklappbaren Bewertungsbereichen.</p>
+        <p class="subline">Minimal eingeben, Details aufklappen, abgeleitete Werte automatisch berechnen.</p>
       </div>
       <div class="hero-card">
         <span>Ertragswert</span>
@@ -48,18 +48,22 @@
         <details class="section" open>
           <summary><span>Bodenwert</span><strong id="landSummary">–</strong></summary>
           <div class="section-body grid three">
-            <label>Aktueller BRW<input type="number" id="baseLandValuePerSqm" min="0" step="10" /><small>€/m²</small></label>
-            <label>Aktuelles BRW-Jahr<input type="number" id="currentBrwYear" min="1900" max="2100" step="1" /></label>
-            <label>Bewertungsjahr<input type="number" id="targetBrwYear" min="1900" max="2100" step="1" /></label>
-            <label>BRW Jahr -1<input type="number" id="historicBrwValue1" min="0" step="10" /><small>€/m², optional</small></label>
-            <label>Jahr -1<input type="number" id="historicBrwYear1" min="1900" max="2100" step="1" /></label>
-            <label>Zeitfaktor<input type="number" id="timeAdjustmentFactor" min="0" step="0.01" readonly /><small>automatisch, ohne Historie = 1</small></label>
-            <label>BRW Jahr -2<input type="number" id="historicBrwValue2" min="0" step="10" /><small>€/m², optional</small></label>
-            <label>Jahr -2<input type="number" id="historicBrwYear2" min="1900" max="2100" step="1" /></label>
+            <label>Aktueller BRW<input type="number" id="baseLandValuePerSqm" min="0" step="10" /><small>€/m², aus BORIS</small></label>
+            <label>BRW-Zeitfaktor<input type="number" id="timeAdjustmentFactor" readonly /><small>automatisch: Historie oder 1,00</small></label>
             <label>WGFZ-/Lagefaktor<input type="number" id="landFeatureFactor" min="0" step="0.01" /></label>
+
+            <div class="full-width history-block">
+              <div class="section-title-inline">
+                <strong>Historische BRW-Werte</strong>
+                <button type="button" id="addBrwHistory">+ Jahr hinzufügen</button>
+              </div>
+              <p class="mini-hint">Optional. Jahre werden automatisch aus Bewertungsstichtag abgeleitet: Zieljahr = Bewertungsjahr, aktuelles BRW-Jahr = Zieljahr - 1. Ohne Historie bleibt der Faktor 1,00.</p>
+              <div id="brwHistoryContainer" class="history-list"></div>
+            </div>
+
             <label>Grundstücksfläche<input type="number" id="plotArea" min="0" step="1" /><small>m²</small></label>
-            <label>wertrelevante Geschossfläche<input type="number" id="relevantFloorArea" min="0" step="1" /><small>m², optional für WGFZ vorhanden</small></label>
-            <label>WGFZ vorhanden<input type="number" id="actualWgfz" readonly /><small>berechnet, falls Daten vorhanden</small></label>
+            <label>wertrelevante Geschossfläche<input type="number" id="relevantFloorArea" min="0" step="1" /><small>m², optional</small></label>
+            <label>WGFZ vorhanden<input type="number" id="actualWgfz" readonly /><small>automatisch, falls Daten vorhanden</small></label>
             <label>Baulandfläche<input type="number" id="buildingLandArea" min="0" step="1" /></label>
             <label>Garten-/Nebenfläche<input type="number" id="gardenArea" min="0" step="1" /></label>
             <label>Gartenansatz<input type="number" id="gardenFactor" min="0" step="0.01" /></label>
@@ -133,12 +137,10 @@
           <div><span>Bruttorendite</span><strong id="grossYield">–</strong></div>
           <div><span>Nettorendite</span><strong id="netYield">–</strong></div>
         </div>
-
         <p class="hint" id="verdict">–</p>
       </section>
     </section>
   </main>
-
   <script src="app.js"></script>
 </body>
 </html>
