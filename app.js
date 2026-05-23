@@ -2,18 +2,16 @@ const DEFAULT_CASE = {
   objectName: 'Wurmlingerstraße 24 – Gutachten-Referenz',
   valuationDate: '2024-01-08',
   borisAddress: 'Wurmlingerstraße 24, 70597 Stuttgart',
+  constructionYear: 1954,
+  totalArea: 239,
   baseLandValuePerSqm: 2300,
-  timeAdjustmentFactor: 0.98,
+  timeAdjustmentFactor: 1,
   landFeatureFactor: 1.0,
+  plotArea: 411,
+  relevantFloorArea: 239,
   buildingLandArea: 411,
   gardenArea: 0,
   gardenFactor: 0.10,
-  unit1Area: 98,
-  unit1Rent: 11.5,
-  unit1Factor: 1,
-  unit2Area: 141,
-  unit2Rent: 14,
-  unit2Factor: 1,
   operatingCostRate: 12.58,
   propertyYield: 1.5,
   remainingLife: 24,
@@ -25,31 +23,10 @@ const DEFAULT_CASE = {
   negotiationBuffer: 5
 };
 
-const FIELD_META = {
-  baseLandValuePerSqm: { required: true, source: 'Manuell aus BORIS-BW / Bodenrichtwertkarte zu übertragen.', validity: 'niedrig', hint: 'Ohne manuelle Quellenprüfung nur Platzhalter.' },
-  timeAdjustmentFactor: { required: true, source: 'Vorbelegt aus Gutachtenlogik / Stichtagsanpassung.', validity: 'mittel', hint: 'Mit Marktbericht oder Bodenpreisindex prüfen.' },
-  landFeatureFactor: { required: true, source: 'Vorbelegt als neutraler Faktor.', validity: 'niedrig', hint: 'WGFZ-/Lageabweichung nach lokalem Marktbericht prüfen.' },
-  buildingLandArea: { required: true, source: 'Vorbelegt aus Referenzfall.', validity: 'mittel', hint: 'Bebaubare Fläche/Baulandanteil objektbezogen prüfen.' },
-  gardenArea: { required: false, source: 'Vorbelegt aus Referenzfall.', validity: 'mittel', hint: 'Nur verwenden, wenn übergroße/anders nutzbare Nebenfläche vorliegt.' },
-  gardenFactor: { required: false, source: 'Schätz-/Modellwert.', validity: 'niedrig', hint: 'Je nach Marktbericht/Gutachtenpraxis prüfen.' },
-  unit1Area: { required: true, source: 'Vorbelegt aus Referenzfall.', validity: 'mittel', hint: 'Wohnfläche aus Exposé/Aufmaß/Mietvertrag prüfen.' },
-  unit1Rent: { required: true, source: 'Vorbelegt als marktübliche Miete.', validity: 'mittel', hint: 'Mit Mietspiegel/Istmiete abgleichen.' },
-  unit1Factor: { required: false, source: 'Vorbelegt neutral.', validity: 'mittel', hint: 'Leerstand/Sondernutzung prüfen.' },
-  unit2Area: { required: true, source: 'Vorbelegt aus Referenzfall.', validity: 'mittel', hint: 'Wohnfläche aus Exposé/Aufmaß/Mietvertrag prüfen.' },
-  unit2Rent: { required: true, source: 'Vorbelegt als marktübliche Miete.', validity: 'mittel', hint: 'Mit Mietspiegel/Istmiete abgleichen.' },
-  unit2Factor: { required: false, source: 'Vorbelegt neutral.', validity: 'mittel', hint: 'Leerstand/Sondernutzung prüfen.' },
-  operatingCostRate: { required: true, source: 'Vorbelegt aus Gutachten-/Modelllogik.', validity: 'mittel', hint: 'Mit ImmoWertV/Marktbericht bzw. Objektart prüfen.' },
-  propertyYield: { required: true, source: 'Vorbelegt aus Referenzgutachten.', validity: 'mittel', hint: 'Mit aktuellem lokalen Marktbericht und Objektart prüfen.' },
-  remainingLife: { required: true, source: 'Vorbelegt aus Referenzgutachten.', validity: 'mittel', hint: 'Baujahr, Modernisierung und Zustand objektbezogen bewerten.' },
-  marketAdjustment: { required: false, source: 'Neutral vorbelegt.', validity: 'mittel', hint: 'Nur setzen, wenn Marktbericht/Gutachtenlogik es begründet.' },
-  bogDeductions: { required: false, source: 'Manuell zu erfassen.', validity: 'niedrig', hint: 'Bauschäden, Rechte, Risiken und Sondermerkmale separat prüfen.' },
-  bogAdditions: { required: false, source: 'Vorbelegt aus Referenzfall.', validity: 'mittel', hint: 'Garagen/Garten/Sonderwerte objektbezogen prüfen.' },
-  purchasePrice: { required: false, source: 'Vorbelegt als Referenzforderung.', validity: 'niedrig', hint: 'Aktuelle Preisforderung eintragen.' },
-  purchaseCostsRate: { required: false, source: 'Typischer Näherungswert.', validity: 'mittel', hint: 'Bundesland, Makler, Notar, Grundbuch prüfen.' },
-  negotiationBuffer: { required: false, source: 'Strategischer Abschlag.', validity: 'niedrig', hint: 'Kein Verkehrswertbestandteil, nur Ankaufstaktik.' }
-};
-
-const fields = Array.from(document.querySelectorAll('input'));
+let brwHistory = [];
+let units = [
+  { name: 'Einheit 1', area: 98, rentMode: 'sqm', rentPerSqm: 11.5, monthlyRent: 1127, factor: 1 }
+];
 
 function numberValue(id) {
   const element = document.getElementById(id);
@@ -64,19 +41,55 @@ function textValue(id) {
 
 function setValue(id, value) {
   const element = document.getElementById(id);
-  if (element) element.value = value;
+  if (element) element.value = value ?? '';
 }
 
 function euro(value) {
-  return new Intl.NumberFormat('de-DE', {
-    style: 'currency',
-    currency: 'EUR',
-    maximumFractionDigits: 0
-  }).format(value || 0);
+  return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value || 0);
 }
 
 function percent(value) {
   return `${(value || 0).toFixed(2)} %`;
+}
+
+function getYearFromDate(dateString) {
+  const date = dateString ? new Date(dateString) : new Date();
+  return Number.isFinite(date.getFullYear()) ? date.getFullYear() : new Date().getFullYear();
+}
+
+function calculateBrwTimeFactor(currentBrw, valuationYear) {
+  const currentYear = valuationYear - 1;
+  const points = brwHistory
+    .filter(point => point.year && point.value)
+    .map(point => ({ year: Number(point.year), value: Number(point.value) }))
+    .filter(point => point.year > 0 && point.value > 0);
+
+  if (!currentBrw || points.length === 0) {
+    return { factor: 1, info: 'BRW-Zeitfaktor: keine Historie angegeben, daher Faktor 1,00.' };
+  }
+
+  const allPoints = [...points, { year: currentYear, value: currentBrw }]
+    .sort((a, b) => a.year - b.year);
+
+  if (allPoints.length < 2) {
+    return { factor: 1, info: 'BRW-Zeitfaktor: zu wenig Historie, daher Faktor 1,00.' };
+  }
+
+  const first = allPoints[0];
+  const last = allPoints[allPoints.length - 1];
+  const yearSpan = last.year - first.year;
+  if (yearSpan <= 0) {
+    return { factor: 1, info: 'BRW-Zeitfaktor: Historie nicht auswertbar, daher Faktor 1,00.' };
+  }
+
+  const yearlyTrend = (last.value - first.value) / yearSpan;
+  const targetValue = currentBrw + yearlyTrend * (valuationYear - currentYear);
+  const factor = targetValue > 0 ? targetValue / currentBrw : 1;
+
+  return {
+    factor,
+    info: `BRW-Zeitfaktor: ${currentYear} = ${euro(currentBrw)}/m², Zieljahr ${valuationYear}, linear extrapoliert auf ${euro(targetValue)}/m² → Faktor ${factor.toFixed(3)}.`
+  };
 }
 
 function calculateCapitalizationFactor(propertyYieldPercent, remainingLifeYears) {
@@ -88,23 +101,33 @@ function calculateCapitalizationFactor(propertyYieldPercent, remainingLifeYears)
   return (Math.pow(q, n) - 1) / (Math.pow(q, n) * p);
 }
 
+function unitAnnualIncome(unit) {
+  if (unit.rentMode === 'monthly') {
+    return (Number(unit.monthlyRent) || 0) * 12 * ((Number(unit.factor) || 0));
+  }
+  return (Number(unit.area) || 0) * (Number(unit.rentPerSqm) || 0) * 12 * ((Number(unit.factor) || 0));
+}
+
 function readCase() {
+  const valuationYear = getYearFromDate(textValue('valuationDate'));
+  const brwFactor = calculateBrwTimeFactor(numberValue('baseLandValuePerSqm'), valuationYear);
+  setValue('timeAdjustmentFactor', brwFactor.factor.toFixed(3));
+  setText('brwTrendInfo', brwFactor.info);
+
   return {
     objectName: textValue('objectName'),
     valuationDate: textValue('valuationDate'),
     borisAddress: textValue('borisAddress'),
+    constructionYear: numberValue('constructionYear'),
+    totalArea: numberValue('totalArea'),
     baseLandValuePerSqm: numberValue('baseLandValuePerSqm'),
-    timeAdjustmentFactor: numberValue('timeAdjustmentFactor'),
+    timeAdjustmentFactor: brwFactor.factor,
     landFeatureFactor: numberValue('landFeatureFactor'),
+    plotArea: numberValue('plotArea'),
+    relevantFloorArea: numberValue('relevantFloorArea'),
     buildingLandArea: numberValue('buildingLandArea'),
     gardenArea: numberValue('gardenArea'),
     gardenFactor: numberValue('gardenFactor'),
-    unit1Area: numberValue('unit1Area'),
-    unit1Rent: numberValue('unit1Rent'),
-    unit1Factor: numberValue('unit1Factor'),
-    unit2Area: numberValue('unit2Area'),
-    unit2Rent: numberValue('unit2Rent'),
-    unit2Factor: numberValue('unit2Factor'),
     operatingCostRate: numberValue('operatingCostRate'),
     propertyYield: numberValue('propertyYield'),
     remainingLife: numberValue('remainingLife'),
@@ -113,23 +136,19 @@ function readCase() {
     bogAdditions: numberValue('bogAdditions'),
     purchasePrice: numberValue('purchasePrice'),
     purchaseCostsRate: numberValue('purchaseCostsRate'),
-    negotiationBuffer: numberValue('negotiationBuffer')
+    negotiationBuffer: numberValue('negotiationBuffer'),
+    units,
+    brwHistory
   };
 }
 
-function loadCase(data) {
-  Object.entries({ ...DEFAULT_CASE, ...data }).forEach(([key, value]) => setValue(key, value));
-  update();
-}
-
 function calculate(data) {
+  const actualWgfz = data.plotArea > 0 && data.relevantFloorArea > 0 ? data.relevantFloorArea / data.plotArea : 0;
   const adjustedBrw = data.baseLandValuePerSqm * data.timeAdjustmentFactor * data.landFeatureFactor;
   const buildingLandValue = adjustedBrw * data.buildingLandArea;
   const gardenLandValue = adjustedBrw * data.gardenArea * data.gardenFactor;
   const landValue = buildingLandValue + gardenLandValue;
-  const unit1GrossIncome = data.unit1Area * data.unit1Rent * 12 * data.unit1Factor;
-  const unit2GrossIncome = data.unit2Area * data.unit2Rent * 12 * data.unit2Factor;
-  const grossIncome = unit1GrossIncome + unit2GrossIncome;
+  const grossIncome = data.units.reduce((sum, unit) => sum + unitAnnualIncome(unit), 0);
   const operatingCosts = grossIncome * data.operatingCostRate / 100;
   const netIncome = grossIncome - operatingCosts;
   const landInterest = landValue * data.propertyYield / 100;
@@ -146,7 +165,7 @@ function calculate(data) {
   const rentMultiplier = grossIncome > 0 ? data.purchasePrice / grossIncome : 0;
   const grossYield = data.purchasePrice > 0 ? grossIncome / data.purchasePrice * 100 : 0;
   const netYield = data.purchasePrice > 0 ? netIncome / data.purchasePrice * 100 : 0;
-  return { adjustedBrw, buildingLandValue, gardenLandValue, landValue, grossIncome, operatingCosts, netIncome, landInterest, buildingIncome, multiplier, buildingValue, preliminaryIncomeValue, marketAdjustedValue, bogTotal, incomeValue, targetOffer, totalAcquisitionCost, valueGap, rentMultiplier, grossYield, netYield };
+  return { actualWgfz, adjustedBrw, buildingLandValue, gardenLandValue, landValue, grossIncome, operatingCosts, netIncome, landInterest, buildingIncome, multiplier, buildingValue, preliminaryIncomeValue, marketAdjustedValue, bogTotal, incomeValue, targetOffer, totalAcquisitionCost, valueGap, rentMultiplier, grossYield, netYield };
 }
 
 function setText(id, value) {
@@ -154,14 +173,56 @@ function setText(id, value) {
   if (element) element.textContent = value;
 }
 
+function renderUnits() {
+  const container = document.getElementById('unitsContainer');
+  if (!container) return;
+  container.innerHTML = units.map((unit, index) => `
+    <div class="unit-card">
+      <div class="unit-head">
+        <strong>${unit.name || `Einheit ${index + 1}`}</strong>
+        <button type="button" data-remove-unit="${index}" ${units.length === 1 ? 'disabled' : ''}>Entfernen</button>
+      </div>
+      <div class="grid three compact-grid">
+        <label>Name<input data-unit-field="name" data-unit-index="${index}" value="${unit.name || ''}" /></label>
+        <label>Fläche<input type="number" data-unit-field="area" data-unit-index="${index}" value="${unit.area || 0}" min="0" step="1" /><small>m²</small></label>
+        <label>Mietmodus<select data-unit-field="rentMode" data-unit-index="${index}"><option value="sqm" ${unit.rentMode === 'sqm' ? 'selected' : ''}>€/m²</option><option value="monthly" ${unit.rentMode === 'monthly' ? 'selected' : ''}>Monatsmiete</option></select></label>
+        <label>Miete €/m²<input type="number" data-unit-field="rentPerSqm" data-unit-index="${index}" value="${unit.rentPerSqm || 0}" min="0" step="0.1" /></label>
+        <label>Monatsmiete<input type="number" data-unit-field="monthlyRent" data-unit-index="${index}" value="${unit.monthlyRent || 0}" min="0" step="10" /></label>
+        <label>Faktor<input type="number" data-unit-field="factor" data-unit-index="${index}" value="${unit.factor || 1}" min="0" step="0.1" /></label>
+      </div>
+      <small>Jahresrohertrag: ${euro(unitAnnualIncome(unit))}</small>
+    </div>
+  `).join('');
+}
+
+function renderBrwHistory() {
+  const container = document.getElementById('brwHistoryContainer');
+  if (!container) return;
+  container.innerHTML = brwHistory.map((point, index) => `
+    <div class="history-row">
+      <label>Jahr<input type="number" data-history-field="year" data-history-index="${index}" value="${point.year || ''}" min="1900" max="2100" step="1" /></label>
+      <label>BRW<input type="number" data-history-field="value" data-history-index="${index}" value="${point.value || ''}" min="0" step="10" /></label>
+      <button type="button" data-remove-history="${index}">Entfernen</button>
+    </div>
+  `).join('');
+}
+
 function update() {
   const data = readCase();
   const result = calculate(data);
+  setValue('actualWgfz', result.actualWgfz ? result.actualWgfz.toFixed(2) : '');
+  setValue('unitCountDisplay', data.units.length);
+
   setText('headlineValue', euro(result.incomeValue));
   setText('headlineMeta', `${data.objectName} · ${data.valuationDate}`);
+  setText('objectSummary', `${data.borisAddress || 'keine Adresse'} · ${data.totalArea || 0} m²`);
+  setText('landSummary', euro(result.landValue));
+  setText('incomeSummary', `${euro(result.grossIncome)} / Jahr`);
+  setText('modelSummary', `LZ ${data.propertyYield.toFixed(2)} % · RND ${data.remainingLife} J.`);
+  setText('bogSummary', euro(result.bogTotal));
+  setText('purchaseSummary', `Ziel ${euro(result.targetOffer)}`);
+
   setText('adjustedBrw', `${euro(result.adjustedBrw)} / m²`);
-  setText('buildingLandValue', euro(result.buildingLandValue));
-  setText('gardenLandValue', euro(result.gardenLandValue));
   setText('landValue', euro(result.landValue));
   setText('grossIncome', euro(result.grossIncome));
   setText('operatingCosts', euro(result.operatingCosts));
@@ -171,7 +232,6 @@ function update() {
   setText('multiplier', result.multiplier.toFixed(3));
   setText('buildingValue', euro(result.buildingValue));
   setText('preliminaryIncomeValue', euro(result.preliminaryIncomeValue));
-  setText('marketAdjustedValue', euro(result.marketAdjustedValue));
   setText('bogTotal', euro(result.bogTotal));
   setText('incomeValue', euro(result.incomeValue));
   setText('targetOffer', euro(result.targetOffer));
@@ -190,41 +250,19 @@ function update() {
 }
 
 function buildSummary(data, result) {
-  return `# Kurzbewertung ${data.objectName}\n\n` +
-    `Bewertungsstichtag: ${data.valuationDate}\n\n` +
-    `## Ertragswertverfahren\n` +
-    `- Angepasster BRW: ${euro(result.adjustedBrw)} / m²\n` +
-    `- Bodenwert: ${euro(result.landValue)}\n` +
-    `- Jahresrohertrag: ${euro(result.grossIncome)}\n` +
-    `- Bewirtschaftungskosten: ${euro(result.operatingCosts)}\n` +
-    `- Jahresreinertrag: ${euro(result.netIncome)}\n` +
-    `- Liegenschaftszins: ${data.propertyYield.toFixed(2)} %\n` +
-    `- Restnutzungsdauer: ${data.remainingLife} Jahre\n` +
-    `- Kapitalisierungsfaktor: ${result.multiplier.toFixed(3)}\n` +
-    `- boG saldiert: ${euro(result.bogTotal)}\n` +
-    `- Ertragswert: ${euro(result.incomeValue)}\n\n` +
-    `## Ankauf\n` +
-    `- Ziel-Angebot: ${euro(result.targetOffer)}\n` +
-    `- Kaufpreisforderung inkl. Nebenkosten: ${euro(result.totalAcquisitionCost)}\n` +
-    `- Differenz: ${euro(result.valueGap)}\n`;
+  return `# Kurzbewertung ${data.objectName}\n\nErtragswert: ${euro(result.incomeValue)}\nZiel-Angebot: ${euro(result.targetOffer)}\nBodenwert: ${euro(result.landValue)}\nJahresrohertrag: ${euro(result.grossIncome)}\nLiegenschaftszins: ${data.propertyYield.toFixed(2)} %\nRND: ${data.remainingLife} Jahre\n`;
 }
 
-function annotateFields() {
-  Object.entries(FIELD_META).forEach(([id, meta]) => {
-    const input = document.getElementById(id);
-    const label = input?.closest('label');
-    if (!input || !label || label.querySelector('.meta-row')) return;
-    if (meta.required) input.required = true;
-    const row = document.createElement('div');
-    row.className = 'meta-row';
-    row.innerHTML = `
-      ${meta.required ? '<span class="badge required">Pflichtwert</span>' : '<span class="badge optional">optional</span>'}
-      <span class="badge auto">vorbelegt</span>
-      <span class="badge validity ${meta.validity}">Validität: ${meta.validity}</span>
-      <span class="meta-hint" title="${meta.source} ${meta.hint}">ⓘ</span>
-    `;
-    label.appendChild(row);
+function loadCase(data) {
+  const merged = { ...DEFAULT_CASE, ...data };
+  Object.entries(merged).forEach(([key, value]) => {
+    if (!['units', 'brwHistory'].includes(key)) setValue(key, value);
   });
+  units = merged.units?.length ? merged.units : units;
+  brwHistory = merged.brwHistory || [];
+  renderUnits();
+  renderBrwHistory();
+  update();
 }
 
 function openExternal(url) {
@@ -235,15 +273,62 @@ function encodedAddress() {
   return encodeURIComponent(textValue('borisAddress') || textValue('objectName') || 'Stuttgart');
 }
 
-fields.forEach(field => field.addEventListener('input', update));
+document.addEventListener('input', event => {
+  const unitIndex = event.target.dataset.unitIndex;
+  const unitField = event.target.dataset.unitField;
+  const historyIndex = event.target.dataset.historyIndex;
+  const historyField = event.target.dataset.historyField;
+
+  if (unitField !== undefined) {
+    units[unitIndex][unitField] = event.target.type === 'number' ? numberValueFromElement(event.target) : event.target.value;
+    renderUnits();
+  }
+  if (historyField !== undefined) {
+    brwHistory[historyIndex][historyField] = numberValueFromElement(event.target);
+  }
+  update();
+});
+
+function numberValueFromElement(element) {
+  return parseFloat(String(element.value).replace(',', '.')) || 0;
+}
+
+document.addEventListener('click', event => {
+  const removeUnit = event.target.dataset.removeUnit;
+  const removeHistory = event.target.dataset.removeHistory;
+  if (removeUnit !== undefined && units.length > 1) {
+    units.splice(Number(removeUnit), 1);
+    renderUnits();
+    update();
+  }
+  if (removeHistory !== undefined) {
+    brwHistory.splice(Number(removeHistory), 1);
+    renderBrwHistory();
+    update();
+  }
+});
+
+document.getElementById('addUnit')?.addEventListener('click', () => {
+  units.push({ name: `Einheit ${units.length + 1}`, area: 0, rentMode: 'sqm', rentPerSqm: 0, monthlyRent: 0, factor: 1 });
+  renderUnits();
+  update();
+});
+
+document.getElementById('addBrwHistory')?.addEventListener('click', () => {
+  const valuationYear = getYearFromDate(textValue('valuationDate'));
+  brwHistory.push({ year: valuationYear - 1 - brwHistory.length, value: 0 });
+  renderBrwHistory();
+  update();
+});
 
 document.getElementById('saveCase')?.addEventListener('click', () => {
   localStorage.setItem('immowert-case', JSON.stringify(readCase()));
-  update();
 });
 
 document.getElementById('resetCase')?.addEventListener('click', () => {
   localStorage.removeItem('immowert-case');
+  brwHistory = [];
+  units = [{ name: 'Einheit 1', area: 98, rentMode: 'sqm', rentPerSqm: 11.5, monthlyRent: 1127, factor: 1 }];
   loadCase(DEFAULT_CASE);
 });
 
@@ -259,6 +344,5 @@ document.getElementById('openGeoportal')?.addEventListener('click', () => {
   openExternal(`https://www.google.com/search?q=${encodedAddress()}+Geoportal+Stuttgart+Bodenrichtwert`);
 });
 
-annotateFields();
 const savedCase = localStorage.getItem('immowert-case');
 loadCase(savedCase ? JSON.parse(savedCase) : DEFAULT_CASE);
