@@ -32,9 +32,9 @@
         <details class="section" open>
           <summary><span>Objekt</span><strong id="objectSummary">–</strong></summary>
           <div class="section-body grid two">
-            <label>Objektname<input id="objectName" /></label>
-            <label>Adresse für BORIS-BW<input id="borisAddress" /></label>
-            <label>Bewertungsstichtag<input type="date" id="valuationDate" /></label>
+            <label>Objektname *<input id="objectName" required /></label>
+            <label>Adresse für BORIS-BW *<input id="borisAddress" required /></label>
+            <label>Bewertungsstichtag *<input type="date" id="valuationDate" required /></label>
             <label>Baujahr<input type="number" id="constructionYear" min="1700" max="2100" step="1" /></label>
             <label>Wohn-/Nutzfläche gesamt<input type="number" id="totalArea" min="0" step="1" /></label>
             <label>Anzahl Einheiten<input type="number" id="unitCountDisplay" readonly /></label>
@@ -48,23 +48,23 @@
         <details class="section" open>
           <summary><span>Bodenwert</span><strong id="landSummary">–</strong></summary>
           <div class="section-body grid three">
-            <label>Aktueller BRW<input type="number" id="baseLandValuePerSqm" min="0" step="10" /><small>€/m², aus BORIS</small></label>
-            <label>BRW-Zeitfaktor<input type="number" id="timeAdjustmentFactor" readonly /><small>automatisch: Historie oder 1,00</small></label>
-            <label>WGFZ-/Lagefaktor<input type="number" id="landFeatureFactor" min="0" step="0.01" /></label>
+            <label>Aktueller BRW *<input type="number" id="baseLandValuePerSqm" min="0" step="10" required /><small>€/m², aus BORIS</small></label>
+            <label>BRW-Zeitfaktor <span title="Berechnung: Bewertungsjahr = Jahr des Bewertungsstichtags. Aktuelles BRW-Jahr = Bewertungsjahr - 1. Ohne historische BRW-Werte gilt Faktor 1,000. Mit Historie wird der lineare Trend aus historischem BRW bis aktuellem BRW gebildet und auf das Bewertungsjahr fortgeschrieben. Faktor = extrapolierter BRW / aktueller BRW.">ⓘ</span><input type="number" id="timeAdjustmentFactor" readonly /><small>automatisch: Historie oder 1,000</small></label>
+            <label>WGFZ-/Lagefaktor *<input type="number" id="landFeatureFactor" min="0" step="0.01" required /></label>
 
             <div class="full-width history-block">
               <div class="section-title-inline">
                 <strong>Historische BRW-Werte</strong>
                 <button type="button" id="addBrwHistory">+ Jahr hinzufügen</button>
               </div>
-              <p class="mini-hint">Optional. Jahre werden automatisch aus Bewertungsstichtag abgeleitet: Zieljahr = Bewertungsjahr, aktuelles BRW-Jahr = Zieljahr - 1. Ohne Historie bleibt der Faktor 1,00.</p>
+              <p class="mini-hint">Optional. Jahre werden automatisch aus Bewertungsstichtag abgeleitet: Zieljahr = Bewertungsjahr, aktuelles BRW-Jahr = Zieljahr - 1. Ohne Historie bleibt der Faktor 1,000.</p>
               <div id="brwHistoryContainer" class="history-list"></div>
             </div>
 
-            <label>Grundstücksfläche<input type="number" id="plotArea" min="0" step="1" /><small>m²</small></label>
+            <label>Grundstücksfläche *<input type="number" id="plotArea" min="0" step="1" required /><small>m²</small></label>
             <label>wertrelevante Geschossfläche<input type="number" id="relevantFloorArea" min="0" step="1" /><small>m², optional</small></label>
             <label>WGFZ vorhanden<input type="number" id="actualWgfz" readonly /><small>automatisch, falls Daten vorhanden</small></label>
-            <label>Baulandfläche<input type="number" id="buildingLandArea" min="0" step="1" /></label>
+            <label>Baulandfläche *<input type="number" id="buildingLandArea" min="0" step="1" required /></label>
             <label>Garten-/Nebenfläche<input type="number" id="gardenArea" min="0" step="1" /></label>
             <label>Gartenansatz<input type="number" id="gardenFactor" min="0" step="0.01" /></label>
             <p class="hint full-width" id="brwTrendInfo">–</p>
@@ -79,7 +79,7 @@
               <button type="button" id="addUnit">+ Einheit hinzufügen</button>
             </div>
             <div class="grid two compact-grid">
-              <label>Bewirtschaftungskosten<input type="number" id="operatingCostRate" min="0" step="0.1" /><small>% vom Rohertrag</small></label>
+              <label>Bewirtschaftungskosten *<input type="number" id="operatingCostRate" min="0" step="0.1" required /><small>% vom Rohertrag</small></label>
             </div>
           </div>
         </details>
@@ -87,8 +87,8 @@
         <details class="section">
           <summary><span>Modellparameter</span><strong id="modelSummary">–</strong></summary>
           <div class="section-body grid three">
-            <label>Liegenschaftszins<input type="number" id="propertyYield" min="0" step="0.1" /><small>% p. a.</small></label>
-            <label>Restnutzungsdauer<input type="number" id="remainingLife" min="1" max="100" step="1" /><small>Jahre</small></label>
+            <label>Liegenschaftszins *<input type="number" id="propertyYield" min="0" step="0.1" required /><small>% p. a.</small></label>
+            <label>Restnutzungsdauer *<input type="number" id="remainingLife" min="1" max="100" step="1" required /><small>Jahre</small></label>
             <label>Marktanpassung<input type="number" id="marketAdjustment" step="0.1" /><small>%</small></label>
           </div>
         </details>
