@@ -101,6 +101,45 @@ label {
   font-weight: 500;
 }
 
+.label-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.info-tooltip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: #0369a1;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: help;
+  flex-shrink: 0;
+}
+
+.info-tooltip:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 0;
+  top: 28px;
+  width: 320px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #0f172a;
+  color: white;
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 500;
+  z-index: 50;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.25);
+}
+
 input,
 select {
   background: white;
@@ -189,32 +228,6 @@ button:disabled {
   padding: 16px;
 }
 
-.history-block .mini-hint {
-  display: none;
-}
-
-.history-block .section-title-inline strong::after {
-  content: " ⓘ";
-  color: #0369a1;
-  cursor: help;
-}
-
-.history-block .section-title-inline strong:hover::before {
-  content: "Optional. Die Jahre werden automatisch aus dem Bewertungsstichtag abgeleitet: Zieljahr = Bewertungsjahr, aktuelles BRW-Jahr = Zieljahr - 1. Ohne Historie bleibt der BRW-Zeitfaktor 1,000.";
-  position: absolute;
-  z-index: 20;
-  max-width: 360px;
-  padding: 10px 12px;
-  margin-top: 28px;
-  background: #0f172a;
-  color: white;
-  border-radius: 10px;
-  font-size: 13px;
-  line-height: 1.35;
-  font-weight: 500;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.25);
-}
-
 .history-list,
 .units {
   display: flex;
@@ -227,11 +240,6 @@ button:disabled {
   grid-template-columns: 1fr 1fr auto;
   gap: 12px;
   align-items: end;
-}
-
-.mini-hint {
-  color: #475569;
-  font-size: 13px;
 }
 
 .compact-grid {
@@ -292,6 +300,10 @@ button:disabled {
   .grid.three,
   .history-row {
     grid-template-columns: 1fr;
+  }
+
+  .info-tooltip:hover::after {
+    width: 240px;
   }
 
   h1 {
