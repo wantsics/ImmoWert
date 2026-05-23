@@ -59,25 +59,26 @@ function getYearFromDate(dateString) {
 
 function calculateBrwTimeFactor(currentBrw, valuationYear) {
   const currentYear = valuationYear - 1;
-  const points = brwHistory
-    .filter(point => point.year && point.value)
+  const historyByYear = new Map();
+
+  brwHistory
     .map(point => ({ year: Number(point.year), value: Number(point.value) }))
-    .filter(point => point.year > 0 && point.value > 0);
+    .filter(point => point.year > 0 && point.value > 0 && point.year !== currentYear)
+    .forEach(point => historyByYear.set(point.year, point.value));
 
-  if (!currentBrw || points.length === 0) {
-    return { factor: 1, info: 'BRW-Zeitfaktor: keine Historie angegeben, daher Faktor 1,00.' };
+  if (!currentBrw || historyByYear.size === 0) {
+    return { factor: 1, info: 'BRW-Zeitfaktor: keine auswertbare Historie angegeben, daher Faktor 1,00.' };
   }
 
-  const allPoints = [...points, { year: currentYear, value: currentBrw }]
-    .sort((a, b) => a.year - b.year);
-
-  if (allPoints.length < 2) {
-    return { factor: 1, info: 'BRW-Zeitfaktor: zu wenig Historie, daher Faktor 1,00.' };
-  }
+  const allPoints = [
+    ...Array.from(historyByYear, ([year, value]) => ({ year, value })),
+    { year: currentYear, value: currentBrw }
+  ].sort((a, b) => a.year - b.year);
 
   const first = allPoints[0];
   const last = allPoints[allPoints.length - 1];
   const yearSpan = last.year - first.year;
+
   if (yearSpan <= 0) {
     return { factor: 1, info: 'BRW-Zeitfaktor: Historie nicht auswertbar, daher Faktor 1,00.' };
   }
@@ -88,7 +89,7 @@ function calculateBrwTimeFactor(currentBrw, valuationYear) {
 
   return {
     factor,
-    info: `BRW-Zeitfaktor: ${currentYear} = ${euro(currentBrw)}/m², Zieljahr ${valuationYear}, linear extrapoliert auf ${euro(targetValue)}/m² → Faktor ${factor.toFixed(3)}.`
+    info: `BRW-Zeitfaktor: aktueller BRW ${currentYear} = ${euro(currentBrw)}/m²; Trend aus ${first.year} (${euro(first.value)}/m²) bis ${last.year} (${euro(last.value)}/m²); Zieljahr ${valuationYear} → ${euro(targetValue)}/m²; Faktor ${factor.toFixed(3)}.`
   };
 }
 
@@ -316,7 +317,8 @@ document.getElementById('addUnit')?.addEventListener('click', () => {
 
 document.getElementById('addBrwHistory')?.addEventListener('click', () => {
   const valuationYear = getYearFromDate(textValue('valuationDate'));
-  brwHistory.push({ year: valuationYear - 1 - brwHistory.length, value: 0 });
+  const currentBrwYear = valuationYear - 1;
+  brwHistory.push({ year: currentBrwYear - 1 - brwHistory.length, value: 0 });
   renderBrwHistory();
   update();
 });
