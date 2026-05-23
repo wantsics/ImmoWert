@@ -3,16 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ImmoWert – Ertragswertverfahren Stuttgart</title>
+  <title>ImmoWert – Ertragswertverfahren</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <main class="app">
     <section class="hero">
       <div>
-        <p class="eyebrow">ImmoWert · Stuttgart MVP</p>
+        <p class="eyebrow">ImmoWert · MVP</p>
         <h1>Ertragswertverfahren</h1>
-        <p class="subline">Lokal laufender Rechner nach allgemeinem Ertragswertverfahren mit Bodenwertanpassung, Liegenschaftszins, Restnutzungsdauer, Bewirtschaftungskosten und boG.</p>
+        <p class="subline">Schneller, lokal laufender Ankaufrechner mit aufklappbaren Bewertungsbereichen.</p>
       </div>
       <div class="hero-card">
         <span>Ertragswert</span>
@@ -23,222 +23,118 @@
 
     <section class="layout">
       <form class="panel input-panel" id="valuationForm">
-        <div class="section-title">
-          <h2>Objekt</h2>
-          <button type="button" id="saveCase">Fall lokal speichern</button>
+        <div class="top-actions">
+          <button type="button" id="saveCase">Fall speichern</button>
+          <button type="button" id="resetCase">Standard laden</button>
+          <button type="button" id="copySummary">Kurzbewertung kopieren</button>
         </div>
 
-        <div class="grid two">
-          <label>
-            Objektname
-            <input id="objectName" value="Wurmlingerstraße 24 – Beispiel" />
-            <small>Speicherung nur im Browser/localStorage</small>
-          </label>
-          <label>
-            Bewertungsstichtag
-            <input type="date" id="valuationDate" value="2024-01-08" />
-            <small>für Dokumentation</small>
-          </label>
-          <label class="full-width">
-            Adresse für BORIS-BW
-            <input id="borisAddress" value="Wurmlingerstraße 24, 70597 Stuttgart" />
-            <small>Button öffnet BORIS/Geoportal-Suche. BRW, WGFZ und Flurstück werden danach manuell übertragen.</small>
-          </label>
-        </div>
+        <details class="section" open>
+          <summary><span>Objekt</span><strong id="objectSummary">–</strong></summary>
+          <div class="section-body grid two">
+            <label>Objektname<input id="objectName" /></label>
+            <label>Adresse für BORIS-BW<input id="borisAddress" /></label>
+            <label>Bewertungsstichtag<input type="date" id="valuationDate" /></label>
+            <label>Baujahr<input type="number" id="constructionYear" min="1700" max="2100" step="1" /></label>
+            <label>Wohn-/Nutzfläche gesamt<input type="number" id="totalArea" min="0" step="1" /></label>
+            <label>Anzahl Einheiten<input type="number" id="unitCountDisplay" readonly /></label>
+            <div class="button-row full-width">
+              <button type="button" id="openBoris">BORIS-BW öffnen</button>
+              <button type="button" id="openGeoportal">Geoportal Stuttgart öffnen</button>
+            </div>
+          </div>
+        </details>
 
-        <div class="actions inline-actions">
-          <button type="button" id="openBoris">BORIS-BW öffnen</button>
-          <button type="button" id="openGeoportal">Geoportal Stuttgart öffnen</button>
-        </div>
+        <details class="section" open>
+          <summary><span>Bodenwert</span><strong id="landSummary">–</strong></summary>
+          <div class="section-body grid three">
+            <label>Aktueller BRW<input type="number" id="baseLandValuePerSqm" min="0" step="10" /><small>€/m²</small></label>
+            <label>Aktuelles BRW-Jahr<input type="number" id="currentBrwYear" min="1900" max="2100" step="1" /></label>
+            <label>Bewertungsjahr<input type="number" id="targetBrwYear" min="1900" max="2100" step="1" /></label>
+            <label>BRW Jahr -1<input type="number" id="historicBrwValue1" min="0" step="10" /><small>€/m², optional</small></label>
+            <label>Jahr -1<input type="number" id="historicBrwYear1" min="1900" max="2100" step="1" /></label>
+            <label>Zeitfaktor<input type="number" id="timeAdjustmentFactor" min="0" step="0.01" readonly /><small>automatisch, ohne Historie = 1</small></label>
+            <label>BRW Jahr -2<input type="number" id="historicBrwValue2" min="0" step="10" /><small>€/m², optional</small></label>
+            <label>Jahr -2<input type="number" id="historicBrwYear2" min="1900" max="2100" step="1" /></label>
+            <label>WGFZ-/Lagefaktor<input type="number" id="landFeatureFactor" min="0" step="0.01" /></label>
+            <label>Grundstücksfläche<input type="number" id="plotArea" min="0" step="1" /><small>m²</small></label>
+            <label>wertrelevante Geschossfläche<input type="number" id="relevantFloorArea" min="0" step="1" /><small>m², optional für WGFZ vorhanden</small></label>
+            <label>WGFZ vorhanden<input type="number" id="actualWgfz" readonly /><small>berechnet, falls Daten vorhanden</small></label>
+            <label>Baulandfläche<input type="number" id="buildingLandArea" min="0" step="1" /></label>
+            <label>Garten-/Nebenfläche<input type="number" id="gardenArea" min="0" step="1" /></label>
+            <label>Gartenansatz<input type="number" id="gardenFactor" min="0" step="0.01" /></label>
+            <p class="hint full-width" id="brwTrendInfo">–</p>
+          </div>
+        </details>
 
-        <h2>Bodenwert</h2>
-        <div class="grid three">
-          <label>
-            Aktueller Bodenrichtwert
-            <input type="number" id="baseLandValuePerSqm" value="2300" min="0" step="10" />
-            <small>€/m² aus BORIS / Marktbericht</small>
-          </label>
-          <label>
-            Aktuelles BRW-Jahr
-            <input type="number" id="currentBrwYear" value="2023" min="1900" max="2100" step="1" />
-            <small>Jahr/Stichtagsjahr des aktuellen BRW</small>
-          </label>
-          <label>
-            Zeitfaktor BRW
-            <input type="number" id="timeAdjustmentFactor" value="1.00" min="0" step="0.01" readonly />
-            <small>wird aus historischen BRW linear extrapoliert; ohne Historie = 1,00</small>
-          </label>
-          <label>
-            Vorjahr 1
-            <input type="number" id="historicBrwYear1" value="" min="1900" max="2100" step="1" />
-            <small>Jahr, z. B. 2022</small>
-          </label>
-          <label>
-            BRW Vorjahr 1
-            <input type="number" id="historicBrwValue1" value="" min="0" step="10" />
-            <small>€/m²</small>
-          </label>
-          <label>
-            Bewertungsjahr für Extrapolation
-            <input type="number" id="targetBrwYear" value="2024" min="1900" max="2100" step="1" />
-            <small>meist Jahr des Bewertungsstichtags</small>
-          </label>
-          <label>
-            Vorjahr 2
-            <input type="number" id="historicBrwYear2" value="" min="1900" max="2100" step="1" />
-            <small>Jahr, z. B. 2021</small>
-          </label>
-          <label>
-            BRW Vorjahr 2
-            <input type="number" id="historicBrwValue2" value="" min="0" step="10" />
-            <small>€/m²</small>
-          </label>
-          <label>
-            WGFZ-/Lagefaktor
-            <input type="number" id="landFeatureFactor" value="1.00" min="0" step="0.01" />
-            <small>lokale Umrechnung</small>
-          </label>
-          <label>
-            Baulandfläche
-            <input type="number" id="buildingLandArea" value="411" min="0" step="1" />
-            <small>m² mit 100 %-Ansatz</small>
-          </label>
-          <label>
-            Garten-/Nebenfläche
-            <input type="number" id="gardenArea" value="347" min="0" step="1" />
-            <small>m² separat bewerten</small>
-          </label>
-          <label>
-            Gartenansatz
-            <input type="number" id="gardenFactor" value="0.10" min="0" step="0.01" />
-            <small>Anteil am angepassten BRW</small>
-          </label>
-        </div>
-        <p class="hint" id="brwTrendInfo">BRW-Zeitfaktor: keine Historie angegeben, daher Faktor 1,00.</p>
+        <details class="section" open>
+          <summary><span>Ertrag</span><strong id="incomeSummary">–</strong></summary>
+          <div class="section-body">
+            <div id="unitsContainer" class="units"></div>
+            <div class="button-row">
+              <button type="button" id="addUnit">+ Einheit hinzufügen</button>
+            </div>
+            <div class="grid two compact-grid">
+              <label>Bewirtschaftungskosten<input type="number" id="operatingCostRate" min="0" step="0.1" /><small>% vom Rohertrag</small></label>
+            </div>
+          </div>
+        </details>
 
-        <h2>Erträge</h2>
-        <div class="grid three">
-          <label>
-            Einheit 1 Fläche
-            <input type="number" id="unit1Area" value="98" min="0" step="1" />
-            <small>m²</small>
-          </label>
-          <label>
-            Einheit 1 Miete
-            <input type="number" id="unit1Rent" value="11.5" min="0" step="0.1" />
-            <small>€/m² netto kalt</small>
-          </label>
-          <label>
-            Einheit 1 Faktor
-            <input type="number" id="unit1Factor" value="1" min="0" step="0.1" />
-            <small>Nutzungs-/Leerstandsfaktor</small>
-          </label>
-          <label>
-            Einheit 2 Fläche
-            <input type="number" id="unit2Area" value="141" min="0" step="1" />
-            <small>m²</small>
-          </label>
-          <label>
-            Einheit 2 Miete
-            <input type="number" id="unit2Rent" value="14" min="0" step="0.1" />
-            <small>€/m² netto kalt</small>
-          </label>
-          <label>
-            Einheit 2 Faktor
-            <input type="number" id="unit2Factor" value="1" min="0" step="0.1" />
-            <small>Nutzungs-/Leerstandsfaktor</small>
-          </label>
-        </div>
+        <details class="section">
+          <summary><span>Modellparameter</span><strong id="modelSummary">–</strong></summary>
+          <div class="section-body grid three">
+            <label>Liegenschaftszins<input type="number" id="propertyYield" min="0" step="0.1" /><small>% p. a.</small></label>
+            <label>Restnutzungsdauer<input type="number" id="remainingLife" min="1" max="100" step="1" /><small>Jahre</small></label>
+            <label>Marktanpassung<input type="number" id="marketAdjustment" step="0.1" /><small>%</small></label>
+          </div>
+        </details>
 
-        <h2>Modellparameter</h2>
-        <div class="grid three">
-          <label>
-            Bewirtschaftungskosten
-            <input type="number" id="operatingCostRate" value="12.58" min="0" step="0.1" />
-            <small>% vom Rohertrag</small>
-          </label>
-          <label>
-            Liegenschaftszins
-            <input type="number" id="propertyYield" value="1.5" min="0" step="0.1" />
-            <small>% p. a.</small>
-          </label>
-          <label>
-            Restnutzungsdauer
-            <input type="number" id="remainingLife" value="24" min="1" max="100" step="1" />
-            <small>Jahre</small>
-          </label>
-          <label>
-            Marktanpassung
-            <input type="number" id="marketAdjustment" value="0" step="0.1" />
-            <small>% auf vorläufigen Ertragswert</small>
-          </label>
-          <label>
-            boG / Abschläge
-            <input type="number" id="bogDeductions" value="0" min="0" step="1000" />
-            <small>€ wertmindernd</small>
-          </label>
-          <label>
-            boG / Zuschläge
-            <input type="number" id="bogAdditions" value="129810" min="0" step="1000" />
-            <small>€ werterhöhend, z. B. Garagen/Garten</small>
-          </label>
-        </div>
+        <details class="section">
+          <summary><span>boG / Risiken</span><strong id="bogSummary">–</strong></summary>
+          <div class="section-body grid two">
+            <label>boG Abschläge<input type="number" id="bogDeductions" min="0" step="1000" /><small>€</small></label>
+            <label>boG Zuschläge<input type="number" id="bogAdditions" min="0" step="1000" /><small>€</small></label>
+          </div>
+        </details>
 
-        <h2>Ankauf</h2>
-        <div class="grid three">
-          <label>
-            Kaufpreisforderung
-            <input type="number" id="purchasePrice" value="1330000" min="0" step="5000" />
-            <small>€</small>
-          </label>
-          <label>
-            Nebenkosten
-            <input type="number" id="purchaseCostsRate" value="10" min="0" step="0.1" />
-            <small>%</small>
-          </label>
-          <label>
-            Verhandlungspuffer
-            <input type="number" id="negotiationBuffer" value="5" min="0" step="0.1" />
-            <small>% Abschlag vom Ertragswert</small>
-          </label>
-        </div>
+        <details class="section">
+          <summary><span>Ankauf</span><strong id="purchaseSummary">–</strong></summary>
+          <div class="section-body grid three">
+            <label>Kaufpreisforderung<input type="number" id="purchasePrice" min="0" step="5000" /></label>
+            <label>Kaufnebenkosten<input type="number" id="purchaseCostsRate" min="0" step="0.1" /><small>%</small></label>
+            <label>Verhandlungspuffer<input type="number" id="negotiationBuffer" min="0" step="0.1" /><small>%</small></label>
+          </div>
+        </details>
       </form>
 
       <section class="panel results-panel">
-        <h2>Rechnung</h2>
+        <h2>Ertragswert</h2>
         <div class="result-list">
           <div><span>Angepasster BRW</span><strong id="adjustedBrw">–</strong></div>
-          <div><span>Bodenwert Bauland</span><strong id="buildingLandValue">–</strong></div>
-          <div><span>Bodenwert Nebenfläche</span><strong id="gardenLandValue">–</strong></div>
-          <div><span>Beitragsfreier Bodenwert</span><strong id="landValue">–</strong></div>
-          <div><span>Jährlicher Rohertrag</span><strong id="grossIncome">–</strong></div>
+          <div><span>Bodenwert</span><strong id="landValue">–</strong></div>
+          <div><span>Jahresrohertrag</span><strong id="grossIncome">–</strong></div>
           <div><span>Bewirtschaftungskosten</span><strong id="operatingCosts">–</strong></div>
-          <div><span>Jährlicher Reinertrag</span><strong id="netIncome">–</strong></div>
+          <div><span>Jahresreinertrag</span><strong id="netIncome">–</strong></div>
           <div><span>Bodenwertverzinsung</span><strong id="landInterest">–</strong></div>
-          <div><span>Reinertragsanteil Gebäude</span><strong id="buildingIncome">–</strong></div>
+          <div><span>Gebäudereinertrag</span><strong id="buildingIncome">–</strong></div>
           <div><span>Kapitalisierungsfaktor</span><strong id="multiplier">–</strong></div>
-          <div><span>Ertragswert Gebäude</span><strong id="buildingValue">–</strong></div>
+          <div><span>Gebäudeertragswert</span><strong id="buildingValue">–</strong></div>
           <div><span>Vorläufiger Ertragswert</span><strong id="preliminaryIncomeValue">–</strong></div>
-          <div><span>Marktangepasster Wert</span><strong id="marketAdjustedValue">–</strong></div>
           <div><span>boG saldiert</span><strong id="bogTotal">–</strong></div>
           <div><span>Ertragswert</span><strong id="incomeValue">–</strong></div>
         </div>
 
-        <h2>Ankaufspreis</h2>
+        <h2>Ankauf</h2>
         <div class="result-list muted">
           <div><span>Ziel-Angebot</span><strong id="targetOffer">–</strong></div>
           <div><span>Kaufpreis inkl. NK</span><strong id="totalAcquisitionCost">–</strong></div>
           <div><span>Differenz inkl. NK</span><strong id="valueGap">–</strong></div>
-          <div><span>Faktor Ist/Soll-Rohertrag</span><strong id="rentMultiplier">–</strong></div>
+          <div><span>Kaufpreisfaktor</span><strong id="rentMultiplier">–</strong></div>
           <div><span>Bruttorendite</span><strong id="grossYield">–</strong></div>
-          <div><span>Nettorendite vor Finanzierung</span><strong id="netYield">–</strong></div>
+          <div><span>Nettorendite</span><strong id="netYield">–</strong></div>
         </div>
 
         <p class="hint" id="verdict">–</p>
-        <div class="actions">
-          <button type="button" id="copySummary">Kurzbewertung kopieren</button>
-          <button type="button" id="resetCase">Standardfall laden</button>
-        </div>
       </section>
     </section>
   </main>
