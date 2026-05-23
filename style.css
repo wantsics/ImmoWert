@@ -80,6 +80,14 @@ h1 {
   grid-template-columns: repeat(2, 1fr);
 }
 
+.grid.three {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
 label {
   display: flex;
   flex-direction: column;
@@ -87,7 +95,8 @@ label {
   color: #cbd5e1;
 }
 
-input {
+input,
+select {
   background: #0f172a;
   border: 1px solid #334155;
   border-radius: 12px;
@@ -102,9 +111,91 @@ small {
 
 summary {
   cursor: pointer;
-  margin-top: 24px;
+  margin-top: 16px;
   margin-bottom: 16px;
   color: #cbd5e1;
+}
+
+.section > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid #1e293b;
+}
+
+.section > summary span {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.section > summary strong {
+  margin-left: auto;
+  text-align: right;
+  color: #e2e8f0;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.top-actions,
+.button-row,
+.section-title-inline,
+.unit-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.top-actions {
+  margin-bottom: 16px;
+}
+
+button {
+  background: #2563eb;
+  color: white;
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.history-block,
+.unit-card {
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.history-list,
+.units {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.history-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.mini-hint {
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.compact-grid {
+  margin-top: 16px;
 }
 
 .result-list {
@@ -117,12 +208,14 @@ summary {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 16px;
   padding: 12px 0;
   border-bottom: 1px solid #1e293b;
 }
 
 .result-list strong {
   font-size: 18px;
+  text-align: right;
 }
 
 .muted strong {
@@ -154,11 +247,17 @@ summary {
 }
 
 @media (max-width: 700px) {
-  .grid.two {
+  .grid.two,
+  .grid.three,
+  .history-row {
     grid-template-columns: 1fr;
   }
 
   h1 {
     font-size: 36px;
+  }
+
+  .section > summary {
+    align-items: flex-start;
   }
 }
