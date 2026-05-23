@@ -1,5 +1,9 @@
 function todayIsoDate() {
-  return new Date().toISOString().slice(0, 10);
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 const DEFAULT_CASE = {
@@ -57,7 +61,7 @@ function percent(value) {
 }
 
 function getYearFromDate(dateString) {
-  const date = dateString ? new Date(dateString) : new Date();
+  const date = dateString ? new Date(`${dateString}T12:00:00`) : new Date();
   return Number.isFinite(date.getFullYear()) ? date.getFullYear() : new Date().getFullYear();
 }
 
@@ -260,7 +264,7 @@ function buildSummary(data, result) {
 
 function loadCase(data) {
   const merged = { ...DEFAULT_CASE, ...data };
-  if (!merged.valuationDate) merged.valuationDate = todayIsoDate();
+  if (!merged.valuationDate || merged.valuationDate === '2024-01-08') merged.valuationDate = todayIsoDate();
   Object.entries(merged).forEach(([key, value]) => {
     if (!['units', 'brwHistory'].includes(key)) setValue(key, value);
   });
