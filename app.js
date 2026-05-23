@@ -1,31 +1,35 @@
+function todayIsoDate() {
+  return new Date().toISOString().slice(0, 10);
+}
+
 const DEFAULT_CASE = {
-  objectName: 'Wurmlingerstraße 24 – Gutachten-Referenz',
-  valuationDate: '2024-01-08',
-  borisAddress: 'Wurmlingerstraße 24, 70597 Stuttgart',
-  constructionYear: 1954,
-  totalArea: 239,
-  baseLandValuePerSqm: 2300,
+  objectName: 'Neues Objekt',
+  valuationDate: todayIsoDate(),
+  borisAddress: '',
+  constructionYear: '',
+  totalArea: '',
+  baseLandValuePerSqm: '',
   timeAdjustmentFactor: 1,
   landFeatureFactor: 1.0,
-  plotArea: 411,
-  relevantFloorArea: 239,
-  buildingLandArea: 411,
+  plotArea: '',
+  relevantFloorArea: '',
+  buildingLandArea: '',
   gardenArea: 0,
   gardenFactor: 0.10,
   operatingCostRate: 12.58,
   propertyYield: 1.5,
-  remainingLife: 24,
+  remainingLife: 40,
   marketAdjustment: 0,
   bogDeductions: 0,
-  bogAdditions: 129810,
-  purchasePrice: 1330000,
+  bogAdditions: 0,
+  purchasePrice: '',
   purchaseCostsRate: 10,
   negotiationBuffer: 5
 };
 
 let brwHistory = [];
 let units = [
-  { name: 'Einheit 1', area: 98, rentMode: 'sqm', rentPerSqm: 11.5, monthlyRent: 1127, factor: 1 }
+  { name: 'Einheit 1', area: 0, rentMode: 'sqm', rentPerSqm: 0, monthlyRent: 0, factor: 1 }
 ];
 
 function numberValue(id) {
@@ -256,10 +260,11 @@ function buildSummary(data, result) {
 
 function loadCase(data) {
   const merged = { ...DEFAULT_CASE, ...data };
+  if (!merged.valuationDate) merged.valuationDate = todayIsoDate();
   Object.entries(merged).forEach(([key, value]) => {
     if (!['units', 'brwHistory'].includes(key)) setValue(key, value);
   });
-  units = merged.units?.length ? merged.units : units;
+  units = merged.units?.length ? merged.units : [{ name: 'Einheit 1', area: 0, rentMode: 'sqm', rentPerSqm: 0, monthlyRent: 0, factor: 1 }];
   brwHistory = merged.brwHistory || [];
   renderUnits();
   renderBrwHistory();
@@ -330,8 +335,8 @@ document.getElementById('saveCase')?.addEventListener('click', () => {
 document.getElementById('resetCase')?.addEventListener('click', () => {
   localStorage.removeItem('immowert-case');
   brwHistory = [];
-  units = [{ name: 'Einheit 1', area: 98, rentMode: 'sqm', rentPerSqm: 11.5, monthlyRent: 1127, factor: 1 }];
-  loadCase(DEFAULT_CASE);
+  units = [{ name: 'Einheit 1', area: 0, rentMode: 'sqm', rentPerSqm: 0, monthlyRent: 0, factor: 1 }];
+  loadCase({ ...DEFAULT_CASE, valuationDate: todayIsoDate() });
 });
 
 document.getElementById('copySummary')?.addEventListener('click', async () => {
@@ -347,4 +352,4 @@ document.getElementById('openGeoportal')?.addEventListener('click', () => {
 });
 
 const savedCase = localStorage.getItem('immowert-case');
-loadCase(savedCase ? JSON.parse(savedCase) : DEFAULT_CASE);
+loadCase(savedCase ? JSON.parse(savedCase) : { ...DEFAULT_CASE, valuationDate: todayIsoDate() });
