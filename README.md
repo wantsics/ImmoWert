@@ -2,75 +2,411 @@
 
 ## Zielsetzung
 
-ImmoWert ist ein transparentes Bewertungs- und Analysewerkzeug für Immobilien mit Fokus auf:
+ImmoWert ist ein transparentes Bewertungs- und Analysewerkzeug für Immobilien.
 
-- Ertragswertverfahren
-- Bodenwertanalyse
-- Datenerhebung / Flächenermittlung
-- spätere Erweiterung um Sachwertverfahren
-- nachvollziehbare und gutachterähnliche Rechenlogik
+Ziel ist nicht ein vereinfachter Online-Rechner, sondern ein nachvollziehbares Werkzeug mit:
 
-Der Fokus liegt bewusst nicht auf einem simplen "Online-Rechner", sondern auf einem nachvollziehbaren Werkzeug mit transparenter Herleitung der Bewertungsparameter.
+- transparenter Rechenlogik
+- nachvollziehbaren Parametern
+- marktberichtnahen Verfahren
+- gutachterähnlicher Struktur
+- integrierter Datenerhebung
+
+Der Nutzer soll jederzeit nachvollziehen können:
+
+```text
+Welche Annahme führt mathematisch zu welchem Wert?
+```
 
 ---
 
 # Grundidee
 
-Viele Marktteilnehmer bewerten Immobilien aktuell vereinfacht über:
+Viele Marktteilnehmer bewerten Immobilien vereinfacht über:
 
-- Wohnfläche × €/m²
-- Kaufpreisfaktor
-- Bauchgefühl
-- Maklerpreis
+```text
+Wohnfläche × Marktpreis
+```
 
-Das führt insbesondere in Phasen steigender Zinsen und heterogener Grundstücksnutzungen zu systematischen Fehlbewertungen.
+oder:
+
+```text
+Kaufpreis / Jahresmiete
+```
+
+Diese Verfahren ignorieren häufig:
+
+- Bodenwertpotenzial
+- Teilflächen
+- WGFZ
+- Marktanpassungen
+- Restnutzungsdauer
+- Modernisierung
+- Finanzierungskosten
+- Planungsrecht
 
 ImmoWert versucht stattdessen:
 
-- Bodenwert logisch zu zerlegen
-- Nutzbarkeit zu bewerten
-- Marktparameter transparent zu machen
-- Ertragswert normnah zu berechnen
-- Datenerhebung direkt in den Workflow zu integrieren
+- reale Nutzbarkeit zu modellieren
+- Grundstücke differenziert zu bewerten
+- Ertragswerte normnah zu berechnen
+- sämtliche Rechenschritte transparent offenzulegen
 
 ---
 
-# Aktuelle Module
+# Ertragswertverfahren
 
-## 1. Ertragswertverfahren
+## Grundstruktur
 
-Aktuell implementiert:
-
-- Jahresrohertrag
-- Bewirtschaftungskosten
-- Jahresreinertrag
-- Bodenwertverzinsung
-- Gebäudereinertrag
-- Kapitalisierung / Vervielfältiger
-- Gebäudeertragswert
-- vorläufiger Ertragswert
-- boG-Zuschläge / Abschläge
-- finaler Ertragswert
-
-Grundformel:
+Das Ertragswertverfahren basiert auf:
 
 ```text
 Ertragswert = Gebäudeertragswert + Bodenwert ± boG
 ```
 
-Gebäudeertragswert:
+mit:
+
+- boG = besondere objektspezifische Grundstücksmerkmale
+
+---
+
+# Jahresrohertrag
+
+Der Jahresrohertrag ergibt sich aus:
 
 ```text
-Gebäudereinertrag × Kapitalisierungsfaktor
+Σ(Mieteinheit)
 ```
 
-Gebäudereinertrag:
+Aktuell unterstützt:
+
+## Variante A
 
 ```text
-Jahresreinertrag − Bodenwertverzinsung
+Wohnfläche × €/m² × 12
 ```
 
-Kapitalisierungsfaktor:
+## Variante B
+
+```text
+Monatsmiete × 12
+```
+
+Optional:
+
+```text
+Faktor × Jahresmiete
+```
+
+für:
+
+- Leerstand
+- Teilnutzung
+- Risiko
+- temporäre Vermietung
+
+---
+
+# Bewirtschaftungskosten
+
+Aktuell vereinfacht:
+
+```text
+Bewirtschaftungskosten = Jahresrohertrag × Kostenquote
+```
+
+Beispiel:
+
+```text
+37.212 € × 12,58 % = 4.682 €
+```
+
+Später geplant:
+
+- Verwaltungskosten
+- Instandhaltungskosten
+- Mietausfallwagnis
+- Betriebskostenstruktur
+- objektspezifische Modelle
+
+---
+
+# Jahresreinertrag
+
+```text
+Jahresreinertrag = Jahresrohertrag − Bewirtschaftungskosten
+```
+
+---
+
+# Bodenwert
+
+## Grundidee
+
+Nicht jede Grundstücksfläche besitzt denselben Wert.
+
+Deshalb erfolgt eine Trennung in:
+
+| Flächentyp | Typischer Ansatz |
+|---|---|
+| Bauland | 100 % |
+| Gartenland | 10–40 % |
+| PFG / Restflächen | reduziert |
+
+---
+
+# Bodenwertberechnung
+
+Aktuell:
+
+```text
+angepasster BRW
+= BRW × Zeitfaktor × Lage-/WGFZ-Faktor
+```
+
+anschließend:
+
+```text
+Bodenwert
+= BRW_adj × Bauland
++ BRW_adj × Gartenfläche × Gartenfaktor
+```
+
+Beispiel:
+
+```text
+BRW = 1.500 €/m²
+Zeitfaktor = 1,05
+WGFZ-Faktor = 0,92
+
+BRW_adj = 1.500 × 1,05 × 0,92
+= 1.449 €/m²
+```
+
+---
+
+# BRW-Zeitfaktor
+
+Historische BRW-Werte können eingetragen werden.
+
+Aktuell wird daraus eine lineare Fortschreibung erzeugt.
+
+Beispiel:
+
+| Jahr | BRW |
+|---|---|
+| 2020 | 1.100 €/m² |
+| 2024 | 1.500 €/m² |
+
+Gradient:
+
+```text
+(1500 − 1100) / 4
+= 100 €/m² pro Jahr
+```
+
+Zieljahr 2026:
+
+```text
+1.500 + 2 × 100
+= 1.700 €/m²
+```
+
+Zeitfaktor:
+
+```text
+1.700 / 1.500 = 1,133
+```
+
+---
+
+# WGFZ-/Lagefaktor
+
+Der Bodenrichtwert beschreibt ein typisches Richtwertgrundstück.
+
+Reale Grundstücke weichen häufig ab.
+
+Typische Ursachen:
+
+- andere GFZ
+- andere WGFZ
+- andere Nutzbarkeit
+- schlechter Zuschnitt
+- Topografie
+- eingeschränkte Bebaubarkeit
+
+Daher:
+
+```text
+BRW_adj = BRW × Lage-/WGFZ-Faktor
+```
+
+Beispiel:
+
+```text
+BRW = 1.500 €/m²
+WGFZ-Faktor = 0,85
+
+→ 1.275 €/m²
+```
+
+---
+
+# Bodenwertverzinsung
+
+Der Bodenwert wird im Ertragswertverfahren separat verzinst.
+
+```text
+Bodenwertverzinsung = Bodenwert × Liegenschaftszins
+```
+
+Beispiel:
+
+```text
+926.000 € × 1,5 %
+= 13.890 €
+```
+
+---
+
+# Gebäudereinertrag
+
+```text
+Gebäudereinertrag
+= Jahresreinertrag − Bodenwertverzinsung
+```
+
+Beispiel:
+
+```text
+32.524 € − 13.890 €
+= 18.634 €
+```
+
+---
+
+# Restnutzungsdauer (RND)
+
+## Ziel
+
+Die modifizierte Restnutzungsdauer soll möglichst gutachter- und marktberichtnah bestimmt werden.
+
+---
+
+# Gebäudealter
+
+```text
+Gebäudealter
+= Bewertungsjahr − Baujahr
+```
+
+---
+
+# Basis-RND
+
+```text
+Basis-RND
+= GND − Gebäudealter
+```
+
+mit:
+
+- GND = Gesamtnutzungsdauer
+
+---
+
+# Modernisierungspunktesystem
+
+Das System orientiert sich an der ImmoWertA.
+
+Aktuell:
+
+| Gewerk | Max Punkte |
+|---|---|
+| Dach | 4 |
+| Fenster | 2 |
+| Leitungen | 2 |
+| Heizung | 2 |
+| Fassade | 4 |
+| Bäder | 2 |
+| Innenausbau | 2 |
+| Grundriss | 2 |
+
+Maximal:
+
+```text
+20 Punkte
+```
+
+---
+
+# Tabellenverfahren ImmoWertA
+
+Aktuell bevorzugtes Verfahren.
+
+Verwendet:
+
+```text
+Gebäudealter
++ GND
++ Modernisierungspunkte
+```
+
+→ Lookup aus ImmoWertA Tabelle.
+
+Beispiel:
+
+```text
+Baujahr = 1937
+Bewertungsjahr = 2024
+Alter = 87 Jahre
+GND = 80 Jahre
+Modernisierung = 5 Punkte
+```
+
+Tabellenalter:
+
+```text
+min(87,80) = 80
+```
+
+ImmoWertA Tabelle b:
+
+```text
+Alter 80
+Punkte 5
+→ RND 24 Jahre
+```
+
+---
+
+# Formel-/Näherungsverfahren
+
+Optionaler Fallback.
+
+Aktuell:
+
+```text
+Rejuvenation
+= Tabellenalter × Punkte/20 × 0,55
+```
+
+anschließend:
+
+```text
+RND
+= Basis-RND + Rejuvenation
+```
+
+Dieses Verfahren dient nur als Approximation.
+
+Das Tabellenverfahren besitzt Vorrang.
+
+---
+
+# Kapitalisierung / Vervielfältiger
+
+Der Kapitalisierungsfaktor wird aktuell berechnet über:
 
 ```text
 V = (q^n − 1) / (q^n × p)
@@ -78,275 +414,118 @@ V = (q^n − 1) / (q^n × p)
 
 mit:
 
-- q = 1 + p
+```text
+q = 1 + p
+```
+
+und:
+
 - p = Liegenschaftszins
 - n = Restnutzungsdauer
 
 ---
 
-# 2. Restnutzungsdauer (RND)
-
-## Ziel
-
-Die RND soll möglichst gutachter- und marktberichtnah bestimmt werden.
-
-Aktuell unterstützt:
-
-### Tabellenverfahren ImmoWertA
-
-- Gebäudealter
-- Gesamtnutzungsdauer
-- Modernisierungspunkte
-- Lookup über Tabelle
-
-Die aktuelle Implementierung enthält bereits Teile der ImmoWertA Anlage 2 Tabelle b für GND = 80 Jahre.
-
-Die Tabelle reproduziert reale Gutachten deutlich besser als einfache lineare Näherungen.
-
-### Formel-/Näherungsverfahren
-
-Optional als Fallback:
+# Gebäudeertragswert
 
 ```text
-Rejuvenation = Tabellenalter × Punkte/20 × 0,55
+Gebäudeertragswert
+= Gebäudereinertrag × Kapitalisierungsfaktor
 ```
 
-Wird nur genutzt, wenn keine passende Tabelle hinterlegt ist.
+---
+
+# Vorläufiger Ertragswert
+
+```text
+vorläufiger Ertragswert
+= Gebäudeertragswert + Bodenwert
+```
 
 ---
 
-# 3. Modernisierungspunktesystem
+# boG
 
-Das System orientiert sich an der ImmoWertA.
+Aktuell vereinfacht:
 
-Aktuell berücksichtigt:
+```text
+Ertragswert_final
+= vorläufiger Ertragswert
++ Zuschläge
+− Abschläge
+```
 
-- Dach
-- Fenster
-- Leitungssysteme
-- Heizung
-- Fassadendämmung
-- Bäder
-- Innenausbau
-- Grundrissverbesserung
+Später geplant:
 
-Die Punkte beeinflussen die modifizierte Restnutzungsdauer.
-
----
-
-# 4. Bodenwertlogik
-
-## Ziel
-
-Nicht jede Grundstücksfläche ist gleich viel wert.
-
-Das Tool trennt daher:
-
-- Bauland
-- Garten-/Nebenfläche
-- sonstige Flächen
-
-und erlaubt unterschiedliche Wertansätze.
+- CAPEX
+- Mängelmodell
+- Risikoaufschläge
+- Sanierungsstau
+- energetische Risiken
 
 ---
 
-## Unterstützte Korrekturen
+# Datenerhebung
 
-### BRW-Zeitfaktor
-
-Historische BRW-Werte können eingetragen werden.
-
-Daraus wird ein Trend abgeleitet.
-
-Aktuell:
-
-- lineare Fortschreibung
-- optional
-- ohne Historie Faktor = 1
-
----
-
-### WGFZ-/Lagefaktor
-
-Der Bodenrichtwert kann korrigiert werden bei:
-
-- abweichender WGFZ
-- anderer Nutzbarkeit
-- Lageunterschieden
-- atypischem Grundstück
-
----
-
-### Teilflächenbewertung
-
-Beispiel:
-
-| Fläche | Ansatz |
-|---|---|
-| Bauland | 100 % |
-| Gartenland | 10–40 % |
-| PFG / Restfläche | reduziert |
-
-Diese Methodik orientiert sich an:
-
-- ImmoWertV
-- Grundstücksmarktberichten
-- gerichtlichen Gutachten
-- Sachverständigenpraxis
-
----
-
-# 5. Datenerhebung
-
-Ein zentrales Merkmal des Projekts ist die Verbindung aus:
+Ein zentrales Merkmal des Projekts ist die Kombination aus:
 
 - Geometrie
 - Datenerhebung
 - Bewertung
 
-Aktuell integriert:
+Aktuell:
 
 - Linien messen
 - Flächen messen
 - Maßstab setzen
-- PDF-/Bild-basierter Workflow
+- PDF-/Bild-Workflow
 
-Geplante Erweiterungen:
+Ziel:
 
-- Polygon-Klassifizierung
-- automatische Flächenübernahme
-- Geoportal-/BORIS-Integration
-- Baufensteranalyse
-- Abstandsflächen
-
----
-
-# 6. Sachwertverfahren (geplant)
-
-Das Sachwertverfahren wird insbesondere relevant für:
-
-- EFH
-- ZFH
-- eigengenutzte Immobilien
-
-Geplant:
-
-- NHK 2010
-- BGF
-- Baupreisindex
-- Alterswertminderung
-- Außenanlagen
-- Sachwertfaktor
-- Marktanpassung
+```text
+Geometrie → direkt in Bewertung
+```
 
 ---
 
 # Architektur
 
-## Frontend
-
-Aktuell:
+Aktuell bewusst simpel:
 
 - HTML
 - CSS
 - Vanilla JavaScript
 
-Bewusst ohne schweres Framework.
+Keine Framework-Abhängigkeit.
 
-Ziel:
+Ziele:
 
-- maximale Transparenz
+- Transparenz
 - einfache Erweiterbarkeit
 - lokale Nutzbarkeit
-- keine unnötige Komplexität
+- niedrige Komplexität
 
 ---
 
 # Transparenzprinzip
 
-Ein Kernziel des Projekts ist:
+Das Tool soll keine Blackbox sein.
 
-```text
-Keine Blackbox-Bewertung.
-```
-
-Daher werden:
+Deshalb werden:
 
 - Formeln
 - Tabellen
-- Herleitungen
+- Rechenschritte
 - Annahmen
-- Quellen
 - Faktoren
+- Herleitungen
+- Quellen
 
-möglichst transparent dargestellt.
+offengelegt.
 
-Das Tool soll nachvollziehbar bleiben.
-
----
-
-# Quellen / normative Grundlagen
-
-Das Projekt orientiert sich unter anderem an:
-
-- ImmoWertV
-- ImmoWertA
-- Grundstücksmarktbericht Stuttgart
-- BORIS-BW
-- Sachverständigenpraxis
-- Verkehrswertgutachten
-
----
-
-# Aktuelle Schwächen / offene Punkte
-
-## RND
-
-- Tabellen noch nicht vollständig hinterlegt
-- aktuell primär GND 80
-- Interpolation noch ausbaufähig
-
----
-
-## Marktanpassung
-
-Noch zu simpel.
-
-Fehlen:
-
-- Sachwertfaktoren
-- regionale Anpassungen
-- Teilmarktlogik
-
----
-
-## boG
-
-Aktuell nur saldierte Zuschläge/Abschläge.
-
-Später sinnvoll:
-
-- strukturiertes Mängelmodell
-- CAPEX-Betrachtung
-- Sanierungsstau
-- Risikoaufschläge
-
----
-
-## Datenmodell
-
-Aktuell noch stark UI-orientiert.
-
-Später sinnvoll:
+Ziel:
 
 ```text
-property
- ├── land
- ├── buildings
- ├── units
- ├── valuation
- ├── planningLaw
- └── measurements
+Jeder Wert soll mathematisch nachvollziehbar sein.
 ```
 
 ---
@@ -355,51 +534,45 @@ property
 
 ## Kurzfristig
 
-- vollständige RND-Tabellen
-- bessere Tooltip-Logik
+- vollständige ImmoWertA-Tabellen
+- Interpolation
+- Sachwertverfahren
+- NHK 2010
 - PDF-/Exposé-Import
-- automatische Datenerkennung
+- OCR
 - Ergebnisbericht
 
 ---
 
 ## Mittelfristig
 
-- Sachwertverfahren
-- Bebauungsplananalyse
-- GFZ-/GRZ-Logik
+- GFZ-/GRZ-Analyse
+- Bebauungsplanlogik
 - Nachverdichtungspotenzial
 - Szenarien
+- Sachwertfaktoren
+- Marktmodelle
 
 ---
 
 ## Langfristig
 
-- halbautomatische Gutachtenunterstützung
 - GIS-/Geoportal-Integration
-- OCR + KI-Extraktion
+- BORIS-Schnittstellen
+- KI-gestützte Datenerkennung
+- halbautomatische Gutachtenunterstützung
 - Energieberatung / GEG
-- Entwicklungs- und Projektbewertung
+- Projektentwicklung
 
 ---
 
-# Grundannahme des Projekts
+# Quellen / Grundlagen
 
-Der Marktwert einer Immobilie entsteht nicht allein aus:
+Das Projekt orientiert sich unter anderem an:
 
-```text
-Wohnfläche × Marktpreis
-```
-
-sondern aus:
-
-- Ertrag
-- Nutzbarkeit
-- Bodenpotenzial
-- Marktparametern
-- Planungsrecht
-- Risiko
-- Zustand
-- Finanzierungskosten
-
-ImmoWert versucht diese Faktoren transparent und nachvollziehbar abzubilden.
+- ImmoWertV
+- ImmoWertA
+- Grundstücksmarktberichten
+- BORIS-BW
+- Verkehrswertgutachten
+- Sachverständigenpraxis
