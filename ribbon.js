@@ -7,6 +7,14 @@ function switchView(viewName) {
   });
 }
 
+function updateBrandLabel() {
+  const eyebrow = document.querySelector('.ribbon-eyebrow');
+  if (eyebrow) eyebrow.textContent = 'LAB7784 Immowert';
+  const heroEyebrow = document.querySelector('.hero .eyebrow');
+  if (heroEyebrow) heroEyebrow.textContent = 'LAB7784 Immowert · MVP';
+  document.title = 'LAB7784 Immowert – Analyse & Datenerhebung';
+}
+
 let bogItems = JSON.parse(localStorage.getItem('immowert-bog-items') || '[]');
 function saveBogItems() { localStorage.setItem('immowert-bog-items', JSON.stringify(bogItems)); }
 function sumBogItems(type) { return bogItems.filter(i => i.type === type).reduce((s, i) => s + (Number(i.amount) || 0), 0); }
@@ -190,6 +198,7 @@ document.addEventListener('click', e => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
+  updateBrandLabel();
   document.querySelectorAll('[data-switch-view]').forEach(button => button.addEventListener('click', () => switchView(button.dataset.switchView)));
   injectRadioAlignmentCss();
   injectRndMethodSelector();
