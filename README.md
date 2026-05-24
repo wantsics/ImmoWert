@@ -54,6 +54,75 @@ ImmoWert versucht stattdessen:
 
 ---
 
+# Transparenzprinzip
+
+Das Tool soll keine Blackbox sein.
+
+Offengelegt werden:
+
+- Formeln
+- Tabellen
+- Rechenschritte
+- Zwischenwerte
+- Annahmen
+- Faktoren
+- Herleitungen
+- Quellen
+- Einzelpositionen
+
+Ziel:
+
+```text
+Jeder Ergebniswert soll mathematisch nachvollziehbar sein.
+```
+
+---
+
+# Ergebnis-Tooltips / Explainable Valuation
+
+Ein zentrales Konzept des Projekts ist:
+
+```text
+Explainable Valuation
+```
+
+Jeder wesentliche Ergebniswert besitzt eine dynamische Erklärung.
+
+Beispiel:
+
+```text
+Gebäudereinertrag
+=
+Jahresreinertrag − Bodenwertverzinsung
+
+32.524 €
+− 13.890 €
+=
+18.634 €
+```
+
+Die Tooltips werden live aus den aktuellen Eingabewerten generiert.
+
+Aktuell erklärt:
+
+- angepasster Bodenrichtwert
+- Bodenwert
+- Jahresrohertrag
+- Bewirtschaftungskosten
+- Jahresreinertrag
+- Bodenwertverzinsung
+- Gebäudereinertrag
+- Vervielfältiger
+- Gebäudeertragswert
+- vorläufiger Ertragswert
+- boG-Saldo
+- finaler Ertragswert
+- Renditen
+- Kaufpreisfaktor
+- Ziel-Angebot
+
+---
+
 # Ertragswertverfahren
 
 ## Grundstruktur
@@ -386,6 +455,27 @@ boG wird typischerweise erst am Ende der Wertermittlung berücksichtigt.
 
 ---
 
+# Strukturierte boG-Erfassung
+
+boG wird nicht mehr nur als Gesamtwert erfasst.
+
+Stattdessen werden Einzelpositionen modelliert:
+
+| Typ | Betrag | Kommentar |
+|---|---:|---|
+| Abschlag | −80.000 € | Sanierungsstau Dach |
+| Abschlag | −25.000 € | Feuchtigkeit Keller |
+| Zuschlag | +60.000 € | Ausbaureserve DG |
+| Zuschlag | +100.000 € | Nachverdichtung |
+
+Der Saldo ergibt sich aus:
+
+```text
+boG = Summe Zuschläge − Summe Abschläge
+```
+
+---
+
 # Typische boG-Abschläge
 
 | Merkmal | Wirkung |
@@ -414,37 +504,23 @@ boG wird typischerweise erst am Ende der Wertermittlung berücksichtigt.
 
 # Aktuelle Implementierung
 
-Aktuell vereinfacht:
-
 ```text
 Ertragswert_final
 = vorläufiger Ertragswert
-+ Zuschläge
-− Abschläge
++ Marktanpassung
++ boG
 ```
 
-Beispiel:
+Der boG-Saldo wird automatisch aus allen Einzelpositionen berechnet.
 
-```text
-vorläufiger EW = 1.299.000 €
-boG = +130.000 €
+Die Ergebnis-Tooltips listen zusätzlich:
 
-→ finaler EW = 1.429.000 €
-```
+- Zuschläge
+- Abschläge
+- Kommentare
+- Saldo
 
----
-
-# Geplante boG-Erweiterungen
-
-Später sinnvoll:
-
-- strukturiertes Mängelmodell
-- CAPEX-Modelle
-- Sanierungsstau
-- Risikoaufschläge
-- energetische Risiken
-- Szenarioanalyse
-- Barwert zukünftiger Investitionen
+transparent auf.
 
 ---
 
@@ -465,22 +541,6 @@ Aktuell:
 
 ---
 
-# Transparenzprinzip
-
-Das Tool soll keine Blackbox sein.
-
-Offengelegt werden:
-
-- Formeln
-- Tabellen
-- Rechenschritte
-- Annahmen
-- Faktoren
-- Herleitungen
-- Quellen
-
----
-
 # Architektur
 
 Aktuell bewusst simpel:
@@ -490,6 +550,13 @@ Aktuell bewusst simpel:
 - Vanilla JavaScript
 
 Keine Framework-Abhängigkeit.
+
+Ziele:
+
+- maximale Transparenz
+- einfache Erweiterbarkeit
+- lokale Nutzbarkeit
+- geringe technische Komplexität
 
 ---
 
