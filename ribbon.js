@@ -37,6 +37,7 @@ function injectRndMethodSelector() {
     input.addEventListener('change', () => {
       localStorage.setItem('immowert-rnd-method', input.value);
       if (typeof update === 'function') update();
+      setTimeout(updateResultTooltips, 0);
     });
   });
   const saved = localStorage.getItem('immowert-rnd-method') || 'table';
@@ -100,6 +101,15 @@ function injectRadioAlignmentCss() {
       border-radius: 14px;
       background: #f0f9ff;
     }
+    .result-list div span:first-child {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .result-info {
+      flex: 0 0 auto;
+      margin-left: 4px;
+    }
   `;
   document.head.appendChild(style);
 }
@@ -159,6 +169,98 @@ function installRndTableOverride() {
   };
 }
 
+function fmtEuro(v) {
+  return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(Number(v) || 0);
+}
+function fmtNum(v, digits = 2) {
+  return (Number(v) || 0).toLocaleString('de-DE', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+}
+function fmtPercent(v) {
+  return `${fmtNum(v, 2)} %`;
+}
+
+function getCurrentCaseAndResult() {
+  if (typeof readCase !== 'function' || typeof calculate !== 'function') return null;
+  const d = readCase();
+  const r = calculate(d);
+  return { d, r };
+}
+
+function buildResultExplanations(d, r) {
+  const adjustedBrw = Number(r.adjustedBrw) || 0;
+  const landValue = Number(r.landValue) || 0;
+  const grossIncome = Number(r.grossIncome) || 0;
+  const operatingCosts = Number(r.operatingCosts) || 0;
+  const netIncome = Number(r.netIncome) || 0;
+  const landInterest = Number(r.landInterest) || 0;
+  const buildingIncome = Number(r.buildingIncome) || 0;
+  const multiplier = Number(r.multiplier) || 0;
+  const buildingValue = Number(r.buildingValue) || 0;
+  const preliminaryIncomeValue = Number(r.preliminaryIncomeValue) || 0;
+  const bogTotal = Number(r.bogTotal) || 0;
+  const incomeValue = Number(r.incomeValue) || 0;
+  const targetOffer = Number(r.targetOffer) || 0;
+  const totalAcquisitionCost = Number(r.totalAcquisitionCost) || 0;
+  const valueGap = Number(r.valueGap) || 0;
+  const rentMultiplier = Number(r.rentMultiplier) || 0;
+  const grossYield = Number(r.grossYield) || 0;
+  const netYield = Number(r.netYield) || 0;
+  return {
+    adjustedBrw: `Angepasster BRW = BRW × Zeitfaktor × WGFZ-/Lagefaktor\n${fmtEuro(d.baseLandValuePerSqm)}/m² × ${fmtNum(d.timeAdjustmentFactor, 3)} × ${fmtNum(d.landFeatureFactor, 2)} = ${fmtEuro(adjustedBrw)}/m²`,
+    landValue: `Bodenwert = angepasster BRW × Bauland + angepasster BRW × Gartenfläche × Gartenfaktor\n${fmtEuro(adjustedBrw)}/m² × ${fmtNum(d.buildingLandArea, 0)} m² + ${fmtEuro(adjustedBrw)}/m² × ${fmtNum(d.gardenArea, 0)} m² × ${fmtNum(d.gardenFactor, 2)} = ${fmtEuro(landValue)}`,
+    grossIncome: `Jahresrohertrag = Summe aller Einheiten\nEinheiten: ${d.units.length}\nSumme = ${fmtEuro(grossIncome)} pro Jahr`,
+    operatingCosts: `Bewirtschaftungskosten = Jahresrohertrag × Kostenquote\n${fmtEuro(grossIncome)} × ${fmtPercent(d.operatingCostRate)} = ${fmtEuro(operatingCosts)}`,
+    netIncome: `Jahresreinertrag = Jahresrohertrag − Bewirtschaftungskosten\n${fmtEuro(grossIncome)} − ${fmtEuro(operatingCosts)} = ${fmtEuro(netIncome)}`,
+    landInterest: `Bodenwertverzinsung = Bodenwert × Liegenschaftszins\n${fmtEuro(landValue)} × ${fmtPercent(d.propertyYield)} = ${fmtEuro(landInterest)}`,
+    buildingIncome: `Gebäudereinertrag = Jahresreinertrag − Bodenwertverzinsung\n${fmtEuro(netIncome)} − ${fmtEuro(landInterest)} = ${fmtEuro(buildingIncome)}`,
+    multiplier: `Kapitalisierungsfaktor V = (q^n − 1) / (q^n × p)\np = ${fmtNum(d.propertyYield / 100, 4)}, q = 1 + p, n = ${fmtNum(d.remainingLife, 0)} Jahre\nV = ${fmtNum(multiplier, 3)}`,
+    buildingValue: `Gebäudeertragswert = Gebäudereinertrag × Kapitalisierungsfaktor\n${fmtEuro(buildingIncome)} × ${fmtNum(multiplier, 3)} = ${fmtEuro(buildingValue)}`,
+    preliminaryIncomeValue: `Vorläufiger Ertragswert = Gebäudeertragswert + Bodenwert\n${fmtEuro(buildingValue)} + ${fmtEuro(landValue)} = ${fmtEuro(preliminaryIncomeValue)}`,
+    bogTotal: `boG saldiert = Zuschläge − Abschläge\n${fmtEuro(d.bogAdditions)} − ${fmtEuro(d.bogDeductions)} = ${fmtEuro(bogTotal)}\nboG = besondere objektspezifische Grundstücksmerkmale, z. B. Schäden, Sanierungsstau, Ausbaureserve, Nachverdichtungspotenzial.`,
+    incomeValue: `Ertragswert = vorläufiger Ertragswert + Marktanpassung + boG\nVorläufig: ${fmtEuro(preliminaryIncomeValue)}\nMarktanpassung: ${fmtPercent(d.marketAdjustment)}\nboG: ${fmtEuro(bogTotal)}\nErgebnis = ${fmtEuro(incomeValue)}`,
+    targetOffer: `Ziel-Angebot = Ertragswert × (1 − Verhandlungspuffer)\n${fmtEuro(incomeValue)} × (1 − ${fmtPercent(d.negotiationBuffer)}) = ${fmtEuro(targetOffer)}`,
+    totalAcquisitionCost: `Kaufpreis inkl. Nebenkosten = Kaufpreis × (1 + Kaufnebenkosten)\n${fmtEuro(d.purchasePrice)} × (1 + ${fmtPercent(d.purchaseCostsRate)}) = ${fmtEuro(totalAcquisitionCost)}`,
+    valueGap: `Differenz inkl. NK = Ertragswert − Kaufpreis inkl. Nebenkosten\n${fmtEuro(incomeValue)} − ${fmtEuro(totalAcquisitionCost)} = ${fmtEuro(valueGap)}`,
+    rentMultiplier: `Kaufpreisfaktor = Kaufpreis / Jahresrohertrag\n${fmtEuro(d.purchasePrice)} / ${fmtEuro(grossIncome)} = ${fmtNum(rentMultiplier, 1)}x`,
+    grossYield: `Bruttorendite = Jahresrohertrag / Kaufpreis × 100\n${fmtEuro(grossIncome)} / ${fmtEuro(d.purchasePrice)} × 100 = ${fmtPercent(grossYield)}`,
+    netYield: `Nettorendite = Jahresreinertrag / Kaufpreis × 100\n${fmtEuro(netIncome)} / ${fmtEuro(d.purchasePrice)} × 100 = ${fmtPercent(netYield)}`
+  };
+}
+
+function ensureResultTooltip(id, explanation) {
+  const valueNode = document.getElementById(id);
+  if (!valueNode) return;
+  const row = valueNode.closest('div');
+  const label = row?.querySelector('span:first-child');
+  if (!label) return;
+  let info = label.querySelector('.result-info');
+  if (!info) {
+    info = document.createElement('span');
+    info.className = 'info-tooltip result-info';
+    info.textContent = 'i';
+    label.appendChild(info);
+  }
+  info.dataset.tooltip = explanation;
+}
+
+function updateResultTooltips() {
+  const current = getCurrentCaseAndResult();
+  if (!current) return;
+  const explanations = buildResultExplanations(current.d, current.r);
+  Object.entries(explanations).forEach(([id, text]) => ensureResultTooltip(id, text));
+}
+
+function installResultTooltipUpdateHook() {
+  if (window.__resultTooltipHookInstalled || typeof update !== 'function') return;
+  window.__resultTooltipHookInstalled = true;
+  const originalUpdate = update;
+  update = function(...args) {
+    const result = originalUpdate.apply(this, args);
+    setTimeout(updateResultTooltips, 0);
+    return result;
+  };
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[data-switch-view]').forEach(button => {
     button.addEventListener('click', () => switchView(button.dataset.switchView));
@@ -166,5 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
   injectRadioAlignmentCss();
   injectRndMethodSelector();
   installRndTableOverride();
+  installResultTooltipUpdateHook();
   if (typeof update === 'function') update();
+  setTimeout(updateResultTooltips, 0);
 });
