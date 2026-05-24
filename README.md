@@ -62,6 +62,12 @@ ImmoWert versucht stattdessen:
 Ertragswert = Gebäudeertragswert + Bodenwert ± boG
 ```
 
+mit:
+
+```text
+boG = besondere objektspezifische Grundstücksmerkmale
+```
+
 ---
 
 # Jahresrohertrag
@@ -345,15 +351,6 @@ und:
 | 40 | 33,05 | 29,84 | 27,36 | 25,02 | 22,80 |
 | 50 | 39,20 | 34,85 | 31,42 | 28,37 | 25,73 |
 
-Beispiel:
-
-```text
-RND = 24 Jahre
-Liegenschaftszins = 1,5 %
-
-→ Vervielfältiger ≈ 20,03
-```
-
 ---
 
 # Gebäudeertragswert
@@ -374,7 +371,50 @@ vorläufiger Ertragswert
 
 ---
 
-# boG
+# boG – besondere objektspezifische Grundstücksmerkmale
+
+boG beschreibt wertrelevante Eigenschaften eines Grundstücks oder Gebäudes, die nicht bereits in:
+
+- Bodenwert
+- Ertragswertmodell
+- Marktparametern
+- Standardannahmen
+
+enthalten sind.
+
+boG wird typischerweise erst am Ende der Wertermittlung berücksichtigt.
+
+---
+
+# Typische boG-Abschläge
+
+| Merkmal | Wirkung |
+|---|---|
+| Sanierungsstau | Abschlag |
+| Feuchtigkeit / Schäden | Abschlag |
+| Altlasten | Abschlag |
+| schlechte Vermietbarkeit | Abschlag |
+| Denkmalschutzauflagen | Abschlag |
+| fehlende Stellplätze | Abschlag |
+| CAPEX-Risiken | Abschlag |
+
+---
+
+# Typische boG-Zuschläge
+
+| Merkmal | Wirkung |
+|---|---|
+| Nachverdichtungspotenzial | Zuschlag |
+| Ausbaureserve | Zuschlag |
+| genehmigte Erweiterung | Zuschlag |
+| Sondernutzung | Zuschlag |
+| Mietsteigerungspotenzial | Zuschlag |
+
+---
+
+# Aktuelle Implementierung
+
+Aktuell vereinfacht:
 
 ```text
 Ertragswert_final
@@ -382,6 +422,29 @@ Ertragswert_final
 + Zuschläge
 − Abschläge
 ```
+
+Beispiel:
+
+```text
+vorläufiger EW = 1.299.000 €
+boG = +130.000 €
+
+→ finaler EW = 1.429.000 €
+```
+
+---
+
+# Geplante boG-Erweiterungen
+
+Später sinnvoll:
+
+- strukturiertes Mängelmodell
+- CAPEX-Modelle
+- Sanierungsstau
+- Risikoaufschläge
+- energetische Risiken
+- Szenarioanalyse
+- Barwert zukünftiger Investitionen
 
 ---
 
