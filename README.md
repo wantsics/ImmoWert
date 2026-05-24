@@ -58,27 +58,17 @@ ImmoWert versucht stattdessen:
 
 ## Grundstruktur
 
-Das Ertragswertverfahren basiert auf:
-
 ```text
 Ertragswert = Gebäudeertragswert + Bodenwert ± boG
 ```
-
-mit:
-
-- boG = besondere objektspezifische Grundstücksmerkmale
 
 ---
 
 # Jahresrohertrag
 
-Der Jahresrohertrag ergibt sich aus:
-
 ```text
 Σ(Mieteinheit)
 ```
-
-Aktuell unterstützt:
 
 ## Variante A
 
@@ -98,18 +88,9 @@ Optional:
 Faktor × Jahresmiete
 ```
 
-für:
-
-- Leerstand
-- Teilnutzung
-- Risiko
-- temporäre Vermietung
-
 ---
 
 # Bewirtschaftungskosten
-
-Aktuell vereinfacht:
 
 ```text
 Bewirtschaftungskosten = Jahresrohertrag × Kostenquote
@@ -120,14 +101,6 @@ Beispiel:
 ```text
 37.212 € × 12,58 % = 4.682 €
 ```
-
-Später geplant:
-
-- Verwaltungskosten
-- Instandhaltungskosten
-- Mietausfallwagnis
-- Betriebskostenstruktur
-- objektspezifische Modelle
 
 ---
 
@@ -141,30 +114,15 @@ Jahresreinertrag = Jahresrohertrag − Bewirtschaftungskosten
 
 # Bodenwert
 
-## Grundidee
+## Angepasster Bodenrichtwert
 
-Nicht jede Grundstücksfläche besitzt denselben Wert.
-
-Deshalb erfolgt eine Trennung in:
-
-| Flächentyp | Typischer Ansatz |
-|---|---|
-| Bauland | 100 % |
-| Gartenland | 10–40 % |
-| PFG / Restflächen | reduziert |
+```text
+BRW_adj = BRW × Zeitfaktor × Lage-/WGFZ-Faktor
+```
 
 ---
 
-# Bodenwertberechnung
-
-Aktuell:
-
-```text
-angepasster BRW
-= BRW × Zeitfaktor × Lage-/WGFZ-Faktor
-```
-
-anschließend:
+## Bodenwert
 
 ```text
 Bodenwert
@@ -172,24 +130,11 @@ Bodenwert
 + BRW_adj × Gartenfläche × Gartenfaktor
 ```
 
-Beispiel:
-
-```text
-BRW = 1.500 €/m²
-Zeitfaktor = 1,05
-WGFZ-Faktor = 0,92
-
-BRW_adj = 1.500 × 1,05 × 0,92
-= 1.449 €/m²
-```
-
 ---
 
 # BRW-Zeitfaktor
 
-Historische BRW-Werte können eingetragen werden.
-
-Aktuell wird daraus eine lineare Fortschreibung erzeugt.
+## Historische Fortschreibung
 
 Beispiel:
 
@@ -222,21 +167,6 @@ Zeitfaktor:
 
 # WGFZ-/Lagefaktor
 
-Der Bodenrichtwert beschreibt ein typisches Richtwertgrundstück.
-
-Reale Grundstücke weichen häufig ab.
-
-Typische Ursachen:
-
-- andere GFZ
-- andere WGFZ
-- andere Nutzbarkeit
-- schlechter Zuschnitt
-- Topografie
-- eingeschränkte Bebaubarkeit
-
-Daher:
-
 ```text
 BRW_adj = BRW × Lage-/WGFZ-Faktor
 ```
@@ -244,17 +174,13 @@ BRW_adj = BRW × Lage-/WGFZ-Faktor
 Beispiel:
 
 ```text
-BRW = 1.500 €/m²
-WGFZ-Faktor = 0,85
-
-→ 1.275 €/m²
+1.500 €/m² × 0,85
+= 1.275 €/m²
 ```
 
 ---
 
 # Bodenwertverzinsung
-
-Der Bodenwert wird im Ertragswertverfahren separat verzinst.
 
 ```text
 Bodenwertverzinsung = Bodenwert × Liegenschaftszins
@@ -287,39 +213,23 @@ Beispiel:
 
 # Restnutzungsdauer (RND)
 
-## Ziel
-
-Die modifizierte Restnutzungsdauer soll möglichst gutachter- und marktberichtnah bestimmt werden.
-
----
-
-# Gebäudealter
+## Gebäudealter
 
 ```text
-Gebäudealter
-= Bewertungsjahr − Baujahr
+Gebäudealter = Bewertungsjahr − Baujahr
 ```
 
 ---
 
-# Basis-RND
+## Basis-RND
 
 ```text
-Basis-RND
-= GND − Gebäudealter
+Basis-RND = GND − Gebäudealter
 ```
-
-mit:
-
-- GND = Gesamtnutzungsdauer
 
 ---
 
 # Modernisierungspunktesystem
-
-Das System orientiert sich an der ImmoWertA.
-
-Aktuell:
 
 | Gewerk | Max Punkte |
 |---|---|
@@ -332,29 +242,36 @@ Aktuell:
 | Innenausbau | 2 |
 | Grundriss | 2 |
 
-Maximal:
-
-```text
-20 Punkte
-```
-
 ---
 
-# Tabellenverfahren ImmoWertA
+# ImmoWertA Tabellenverfahren
 
-Aktuell bevorzugtes Verfahren.
-
-Verwendet:
+## Prinzip
 
 ```text
 Gebäudealter
 + GND
 + Modernisierungspunkte
+→ Tabellenwert
 ```
 
-→ Lookup aus ImmoWertA Tabelle.
+---
 
-Beispiel:
+# RND-Tabelle (Auszug GND = 80)
+
+| Alter | P0 | P1 | P2 | P3 | P4 | P5 | P6 | P7 | P8 | P9 | P10 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 68 | 16 | 16 | 19 | 21 | 24 | 27 | 29 | 32 | 34 | 36 | 39 |
+| 70 | 15 | 15 | 18 | 21 | 23 | 26 | 29 | 31 | 34 | 36 | 38 |
+| 72 | 14 | 14 | 17 | 20 | 23 | 25 | 28 | 31 | 33 | 36 | 38 |
+| 74 | 13 | 13 | 16 | 19 | 22 | 25 | 28 | 30 | 33 | 35 | 37 |
+| 76 | 13 | 13 | 16 | 19 | 22 | 25 | 27 | 30 | 33 | 35 | 37 |
+| 78 | 12 | 12 | 15 | 18 | 22 | 24 | 27 | 30 | 32 | 35 | 37 |
+| 80 | 12 | 12 | 15 | 18 | 21 | 24 | 27 | 29 | 32 | 34 | 37 |
+
+---
+
+## Beispiel
 
 ```text
 Baujahr = 1937
@@ -370,7 +287,7 @@ Tabellenalter:
 min(87,80) = 80
 ```
 
-ImmoWertA Tabelle b:
+Tabellenlookup:
 
 ```text
 Alter 80
@@ -382,10 +299,6 @@ Punkte 5
 
 # Formel-/Näherungsverfahren
 
-Optionaler Fallback.
-
-Aktuell:
-
 ```text
 Rejuvenation
 = Tabellenalter × Punkte/20 × 0,55
@@ -394,19 +307,14 @@ Rejuvenation
 anschließend:
 
 ```text
-RND
-= Basis-RND + Rejuvenation
+RND = Basis-RND + Rejuvenation
 ```
-
-Dieses Verfahren dient nur als Approximation.
-
-Das Tabellenverfahren besitzt Vorrang.
 
 ---
 
 # Kapitalisierung / Vervielfältiger
 
-Der Kapitalisierungsfaktor wird aktuell berechnet über:
+## Formel
 
 ```text
 V = (q^n − 1) / (q^n × p)
@@ -422,6 +330,29 @@ und:
 
 - p = Liegenschaftszins
 - n = Restnutzungsdauer
+
+---
+
+# Kapitalisierungsfaktor-Tabelle (Auszug)
+
+| RND | 1,0 % | 1,5 % | 2,0 % | 2,5 % | 3,0 % |
+|---|---|---|---|---|---|
+| 10 | 9,47 | 9,14 | 8,98 | 8,75 | 8,53 |
+| 15 | 13,99 | 13,04 | 12,85 | 12,43 | 11,94 |
+| 20 | 18,05 | 16,92 | 16,35 | 15,59 | 14,88 |
+| 24 | 21,26 | 20,03 | 18,94 | 18,04 | 17,07 |
+| 30 | 25,81 | 23,93 | 22,40 | 21,00 | 19,60 |
+| 40 | 33,05 | 29,84 | 27,36 | 25,02 | 22,80 |
+| 50 | 39,20 | 34,85 | 31,42 | 28,37 | 25,73 |
+
+Beispiel:
+
+```text
+RND = 24 Jahre
+Liegenschaftszins = 1,5 %
+
+→ Vervielfältiger ≈ 20,03
+```
 
 ---
 
@@ -445,8 +376,6 @@ vorläufiger Ertragswert
 
 # boG
 
-Aktuell vereinfacht:
-
 ```text
 Ertragswert_final
 = vorläufiger Ertragswert
@@ -454,23 +383,15 @@ Ertragswert_final
 − Abschläge
 ```
 
-Später geplant:
-
-- CAPEX
-- Mängelmodell
-- Risikoaufschläge
-- Sanierungsstau
-- energetische Risiken
-
 ---
 
 # Datenerhebung
 
-Ein zentrales Merkmal des Projekts ist die Kombination aus:
+## Ziel
 
-- Geometrie
-- Datenerhebung
-- Bewertung
+```text
+Geometrie → direkt in Bewertung
+```
 
 Aktuell:
 
@@ -479,11 +400,21 @@ Aktuell:
 - Maßstab setzen
 - PDF-/Bild-Workflow
 
-Ziel:
+---
 
-```text
-Geometrie → direkt in Bewertung
-```
+# Transparenzprinzip
+
+Das Tool soll keine Blackbox sein.
+
+Offengelegt werden:
+
+- Formeln
+- Tabellen
+- Rechenschritte
+- Annahmen
+- Faktoren
+- Herleitungen
+- Quellen
 
 ---
 
@@ -497,37 +428,6 @@ Aktuell bewusst simpel:
 
 Keine Framework-Abhängigkeit.
 
-Ziele:
-
-- Transparenz
-- einfache Erweiterbarkeit
-- lokale Nutzbarkeit
-- niedrige Komplexität
-
----
-
-# Transparenzprinzip
-
-Das Tool soll keine Blackbox sein.
-
-Deshalb werden:
-
-- Formeln
-- Tabellen
-- Rechenschritte
-- Annahmen
-- Faktoren
-- Herleitungen
-- Quellen
-
-offengelegt.
-
-Ziel:
-
-```text
-Jeder Wert soll mathematisch nachvollziehbar sein.
-```
-
 ---
 
 # Geplante Erweiterungen
@@ -535,6 +435,7 @@ Jeder Wert soll mathematisch nachvollziehbar sein.
 ## Kurzfristig
 
 - vollständige ImmoWertA-Tabellen
+- vollständige Kapitalisierungstabellen
 - Interpolation
 - Sachwertverfahren
 - NHK 2010
@@ -572,7 +473,7 @@ Das Projekt orientiert sich unter anderem an:
 
 - ImmoWertV
 - ImmoWertA
-- Grundstücksmarktberichten
+- Grundstücksmarktberichte
 - BORIS-BW
 - Verkehrswertgutachten
 - Sachverständigenpraxis
