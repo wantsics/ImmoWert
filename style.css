@@ -29,9 +29,10 @@ h1 { margin: 0; font-size: 48px; color: #0f172a; }
 .hero-card strong { display:block; font-size: 36px; }
 .hero-card small { color: rgba(255,255,255,.8); }
 
-.layout { display: grid; grid-template-columns: 1fr 420px; gap: 24px; align-items: start; }
+.layout { display: grid; grid-template-columns: minmax(0,1fr) 420px; gap: 24px; align-items: start; }
 .panel { background: rgba(255,255,255,.92); border: 1px solid #bae6fd; border-radius: 20px; padding: 24px; backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(15,23,42,.06); }
-.results-panel { position: sticky; top: 24px; }
+.results-panel { position: sticky; top: 24px; z-index: 1; }
+.input-panel { position: relative; z-index: 5; overflow: visible; }
 
 .grid { display: grid; gap: 18px; }
 .grid.two { grid-template-columns: repeat(2, minmax(0,1fr)); }
@@ -61,7 +62,10 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 .history-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: end; margin-top: 12px; }
 
 .info-tooltip { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; margin-left: 6px; border-radius: 999px; background: #dbeafe; color: #0369a1; font-size: 12px; font-weight: 800; cursor: help; vertical-align: middle; }
-.info-tooltip:hover::after { content: attr(data-tooltip); position: absolute; left: 0; top: 28px; width: 380px; max-width: 80vw; padding: 12px 14px; border-radius: 12px; background: #0f172a; color: white; font-size: 13px; line-height: 1.45; font-weight: 500; z-index: 200; box-shadow: 0 12px 32px rgba(15,23,42,.25); }
+.info-tooltip:hover::after { content: attr(data-tooltip); position: absolute; right: 0; top: 28px; width: 360px; max-width: min(360px, calc(100vw - 48px)); padding: 12px 14px; border-radius: 12px; background: #0f172a; color: white; font-size: 13px; line-height: 1.45; font-weight: 500; z-index: 9999; box-shadow: 0 12px 32px rgba(15,23,42,.25); text-align: left; }
+.section > summary .info-tooltip:hover::after { left: 0; right: auto; }
+.grid.three label:nth-child(3n) .info-tooltip:hover::after,
+.grid.two label:nth-child(2n) .info-tooltip:hover::after { right: 0; left: auto; }
 
 .modernization-list { display: grid; gap: 10px; margin-top: 18px; }
 .modernization-row { display: grid; grid-template-columns: minmax(220px, 1fr) 220px; gap: 18px; align-items: center; padding: 10px 12px; background: #f8fafc; border: 1px solid #dbeafe; border-radius: 12px; }
