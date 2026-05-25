@@ -81,5 +81,70 @@
       "efhZfhBaujahrFactor": [[1960,1974,0.871],[1975,1984,1.000],[1985,1994,1.129],[1995,2004,1.258],[2005,2022,1.387]],
       "note": "Diese Grundstücksgrößenfaktoren sind Vergleichswertfaktoren für EFH/ZFH, nicht automatisch Bodenwertkorrekturen."
     }
+  },
+  {
+    "id": "fellbach-2022",
+    "name": "Fellbach",
+    "committee": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Fellbach / ab 2021 Gutachterausschuss Unteres Remstal",
+    "reportYear": 2022,
+    "marketPeriod": "2021",
+    "dataPeriod": "2022/2023",
+    "brwStichtag": "2022-01-01",
+    "source": "Grundstücksmarktbericht 2022, Immobilienmarkt 2021, Daten für die Wertermittlung 2022/2023",
+    "profileQuality": "limited_official_data",
+    "landValue": {
+      "model": "brw_manual_no_local_adjustment_tables",
+      "requiredInputs": ["baseLandValuePerSqm", "plotArea", "buildingLandArea"],
+      "optionalInputs": ["gardenArea", "gardenFactor", "manualLocationFactor"],
+      "disabledInputs": ["wgfzSoll", "wgfzCorrectionFactor"],
+      "formula": "Bodenwert = BRW × Zeitfaktor × sachverständiger Faktor × gewichtete Grundstücksfläche",
+      "notes": [
+        "Der Bericht enthält keine eigenen Bodenwert-Umrechnungskoeffizienten nach WGFZ oder Grundstücksgröße.",
+        "Bodenrichtwerte gelten für durchschnittliche Lagewerte in Richtwertzonen und sind auf altlastenfreie und grundsätzlich abgabenfreie Grundstücke bezogen.",
+        "Bodenrichtwerte für Fellbach, Weinstadt und Kernen wurden zum Stichtag 01.01.2022 beschlossen.",
+        "Für konkrete Objekte sind die Bodenrichtwertkarte und objektspezifische sachverständige Anpassungen maßgeblich."
+      ]
+    },
+    "yields": [
+      {
+        "id": "fallback_stuttgart",
+        "label": "Fallback: Stuttgart-Liegenschaftszinssätze, sachverständig anpassen",
+        "yieldPercent": null,
+        "sourceProfile": "stuttgart-2024",
+        "note": "Fellbach leitet im Bericht 2022 keine eigenen Liegenschaftszinssätze ab; wegen räumlicher Nähe/wirtschaftlicher Anbindung werden derzeit noch Stuttgart-Werte herangezogen."
+      }
+    ],
+    "requiredData": {
+      "available": false,
+      "notes": [
+        "Keine nach §193 Abs. 5 BauGB abgeleiteten sonstigen erforderlichen Daten veröffentlicht; Kaufvertragsanzahl reichte nicht aus.",
+        "Der Gemeinsame Gutachterausschuss Unteres Remstal soll diese Daten zukünftig ermitteln."
+      ]
+    },
+    "marketEvidence": {
+      "unbuiltResidentialLand2021AvgEuroSqm": 1215,
+      "unbuiltCommercialLand2021AvgEuroSqm": 425,
+      "builtObjects2021": {
+        "rowHouse": {"count": 7, "meanPriceEuro": 639000, "meanPlotSqm": 257, "meanLivingAreaSqm": 144, "meanEuroSqmLiving": 4429},
+        "semiDetached": {"count": 7, "meanPriceEuro": 649500, "meanPlotSqm": 246, "meanLivingAreaSqm": 139, "meanEuroSqmLiving": 4663},
+        "oneTwoFamily": {"count": 14, "meanPriceEuro": 750739, "meanPlotSqm": 472, "meanLivingAreaSqm": 167, "meanEuroSqmLiving": 4503},
+        "threeFourFamily": {"count": 16, "meanPriceEuro": 920509, "meanPlotSqm": 390, "meanLivingAreaSqm": 223, "meanEuroSqmLiving": 4121}
+      },
+      "parking2021": {
+        "newUndergroundParkingMeanEuro": 26418,
+        "usedUndergroundParkingMeanEuro": 18250,
+        "outdoorParkingMeanEuro": 9357
+      }
+    },
+    "rent": {
+      "qualifiedRentIndexFrom": "2019-08-01",
+      "sourceUrl": "https://www.fellbach.de/mietspiegel",
+      "note": "Alte Mietspiegelreihen sind mit dem qualifizierten Mietspiegel ab 01.08.2019 nicht direkt vergleichbar."
+    },
+    "notes": [
+      "Dieses Profil ist bewusst defensiv: Fellbach 2022 enthält Marktübersichten, aber kaum belastbare tabellarische Wertermittlungsparameter.",
+      "Für Ertragswertansätze ist der jeweilige Stuttgart-Liegenschaftszins nur als Fallback mit sachverständiger Anpassung zu verwenden.",
+      "Für Bodenwertkorrektur aktuell manuelles Modell, bis Unteres Remstal eigene Umrechnungskoeffizienten veröffentlicht."
+    ]
   }
 ]
