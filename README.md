@@ -213,8 +213,8 @@ Bodenwert
 
 Beispiel:
 
-| Jahr | BRW |
-|---|---|
+| Jahr | BRW        |
+| ---- | ---------- |
 | 2020 | 1.100 €/m² |
 | 2024 | 1.500 €/m² |
 
@@ -306,16 +306,16 @@ Basis-RND = GND − Gebäudealter
 
 # Modernisierungspunktesystem
 
-| Gewerk | Max Punkte |
-|---|---|
-| Dach | 4 |
-| Fenster | 2 |
-| Leitungen | 2 |
-| Heizung | 2 |
-| Fassade | 4 |
-| Bäder | 2 |
-| Innenausbau | 2 |
-| Grundriss | 2 |
+| Gewerk      | Max Punkte |
+| ----------- | ---------- |
+| Dach        | 4          |
+| Fenster     | 2          |
+| Leitungen   | 2          |
+| Heizung     | 2          |
+| Fassade     | 4          |
+| Bäder       | 2          |
+| Innenausbau | 2          |
+| Grundriss   | 2          |
 
 ---
 
@@ -334,15 +334,15 @@ Gebäudealter
 
 # RND-Tabelle (Auszug GND = 80)
 
-| Alter | P0 | P1 | P2 | P3 | P4 | P5 | P6 | P7 | P8 | P9 | P10 |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| 68 | 16 | 16 | 19 | 21 | 24 | 27 | 29 | 32 | 34 | 36 | 39 |
-| 70 | 15 | 15 | 18 | 21 | 23 | 26 | 29 | 31 | 34 | 36 | 38 |
-| 72 | 14 | 14 | 17 | 20 | 23 | 25 | 28 | 31 | 33 | 36 | 38 |
-| 74 | 13 | 13 | 16 | 19 | 22 | 25 | 28 | 30 | 33 | 35 | 37 |
-| 76 | 13 | 13 | 16 | 19 | 22 | 25 | 27 | 30 | 33 | 35 | 37 |
-| 78 | 12 | 12 | 15 | 18 | 22 | 24 | 27 | 30 | 32 | 35 | 37 |
-| 80 | 12 | 12 | 15 | 18 | 21 | 24 | 27 | 29 | 32 | 34 | 37 |
+| Alter | P0  | P1  | P2  | P3  | P4  | P5  | P6  | P7  | P8  | P9  | P10 |
+| ----- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 68    | 16  | 16  | 19  | 21  | 24  | 27  | 29  | 32  | 34  | 36  | 39  |
+| 70    | 15  | 15  | 18  | 21  | 23  | 26  | 29  | 31  | 34  | 36  | 38  |
+| 72    | 14  | 14  | 17  | 20  | 23  | 25  | 28  | 31  | 33  | 36  | 38  |
+| 74    | 13  | 13  | 16  | 19  | 22  | 25  | 28  | 30  | 33  | 35  | 37  |
+| 76    | 13  | 13  | 16  | 19  | 22  | 25  | 27  | 30  | 33  | 35  | 37  |
+| 78    | 12  | 12  | 15  | 18  | 22  | 24  | 27  | 30  | 32  | 35  | 37  |
+| 80    | 12  | 12  | 15  | 18  | 21  | 24  | 27  | 29  | 32  | 34  | 37  |
 
 ---
 
@@ -411,14 +411,14 @@ und:
 # Kapitalisierungsfaktor-Tabelle (Auszug)
 
 | RND | 1,0 % | 1,5 % | 2,0 % | 2,5 % | 3,0 % |
-|---|---|---|---|---|---|
-| 10 | 9,47 | 9,14 | 8,98 | 8,75 | 8,53 |
-| 15 | 13,99 | 13,04 | 12,85 | 12,43 | 11,94 |
-| 20 | 18,05 | 16,92 | 16,35 | 15,59 | 14,88 |
-| 24 | 21,26 | 20,03 | 18,94 | 18,04 | 17,07 |
-| 30 | 25,81 | 23,93 | 22,40 | 21,00 | 19,60 |
-| 40 | 33,05 | 29,84 | 27,36 | 25,02 | 22,80 |
-| 50 | 39,20 | 34,85 | 31,42 | 28,37 | 25,73 |
+| --- | ----- | ----- | ----- | ----- | ----- |
+| 10  | 9,47  | 9,14  | 8,98  | 8,75  | 8,53  |
+| 15  | 13,99 | 13,04 | 12,85 | 12,43 | 11,94 |
+| 20  | 18,05 | 16,92 | 16,35 | 15,59 | 14,88 |
+| 24  | 21,26 | 20,03 | 18,94 | 18,04 | 17,07 |
+| 30  | 25,81 | 23,93 | 22,40 | 21,00 | 19,60 |
+| 40  | 33,05 | 29,84 | 27,36 | 25,02 | 22,80 |
+| 50  | 39,20 | 34,85 | 31,42 | 28,37 | 25,73 |
 
 ---
 
@@ -461,12 +461,12 @@ boG wird nicht mehr nur als Gesamtwert erfasst.
 
 Stattdessen werden Einzelpositionen modelliert:
 
-| Typ | Betrag | Kommentar |
-|---|---:|---|
-| Abschlag | −80.000 € | Sanierungsstau Dach |
-| Abschlag | −25.000 € | Feuchtigkeit Keller |
-| Zuschlag | +60.000 € | Ausbaureserve DG |
-| Zuschlag | +100.000 € | Nachverdichtung |
+| Typ      |     Betrag | Kommentar           |
+| -------- | ---------: | ------------------- |
+| Abschlag |  −80.000 € | Sanierungsstau Dach |
+| Abschlag |  −25.000 € | Feuchtigkeit Keller |
+| Zuschlag |  +60.000 € | Ausbaureserve DG    |
+| Zuschlag | +100.000 € | Nachverdichtung     |
 
 Der Saldo ergibt sich aus:
 
@@ -478,27 +478,27 @@ boG = Summe Zuschläge − Summe Abschläge
 
 # Typische boG-Abschläge
 
-| Merkmal | Wirkung |
-|---|---|
-| Sanierungsstau | Abschlag |
-| Feuchtigkeit / Schäden | Abschlag |
-| Altlasten | Abschlag |
+| Merkmal                  | Wirkung  |
+| ------------------------ | -------- |
+| Sanierungsstau           | Abschlag |
+| Feuchtigkeit / Schäden   | Abschlag |
+| Altlasten                | Abschlag |
 | schlechte Vermietbarkeit | Abschlag |
-| Denkmalschutzauflagen | Abschlag |
-| fehlende Stellplätze | Abschlag |
-| CAPEX-Risiken | Abschlag |
+| Denkmalschutzauflagen    | Abschlag |
+| fehlende Stellplätze     | Abschlag |
+| CAPEX-Risiken            | Abschlag |
 
 ---
 
 # Typische boG-Zuschläge
 
-| Merkmal | Wirkung |
-|---|---|
+| Merkmal                   | Wirkung  |
+| ------------------------- | -------- |
 | Nachverdichtungspotenzial | Zuschlag |
-| Ausbaureserve | Zuschlag |
-| genehmigte Erweiterung | Zuschlag |
-| Sondernutzung | Zuschlag |
-| Mietsteigerungspotenzial | Zuschlag |
+| Ausbaureserve             | Zuschlag |
+| genehmigte Erweiterung    | Zuschlag |
+| Sondernutzung             | Zuschlag |
+| Mietsteigerungspotenzial  | Zuschlag |
 
 ---
 

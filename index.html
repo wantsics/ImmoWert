@@ -1,1 +1,467 @@
-<!doctype html><html lang="de"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ImmoWert – Analyse & Datenerhebung</title><link rel="stylesheet" href="style.css"/></head><body><header class="top-ribbon"><div class="ribbon-brand"><span class="ribbon-eyebrow">ImmoWert</span><strong>Immobilienanalyse & Datenerhebung</strong></div><nav class="ribbon-tabs"><button class="ribbon-tab active" data-switch-view="valuation">Ertragswert</button><button class="ribbon-tab" data-switch-view="assetvalue">Sachwert</button><button class="ribbon-tab" data-switch-view="measurement">Datenerhebung</button></nav></header><main class="workspace"><section class="workspace-view active" data-view="valuation"><main class="app"><section class="hero"><div><p class="eyebrow">ImmoWert · MVP</p><h1>Ertragswertverfahren</h1><p class="subline">Bewertung, Bodenwertkorrektur und Datenerhebung in einem Workflow.</p></div><div class="hero-card"><span>Ertragswert</span><strong id="headlineValue">–</strong><small id="headlineMeta">–</small></div></section><section class="layout"><form class="panel input-panel" id="valuationForm"><div class="top-actions"><button type="button" id="saveCase">Fall speichern</button><button type="button" id="resetCase">Standard laden</button><button type="button" id="copySummary">Kurzbewertung kopieren</button></div><details class="section" open><summary><span>Objekt</span><strong id="objectSummary">–</strong></summary><div class="section-body grid two"><label>Objektname *<input id="objectName" required/></label><label>Adresse für BORIS-BW *<input id="borisAddress" required/></label><label>Bewertungsstichtag *<input type="date" id="valuationDate" required/></label><label>Baujahr<input type="number" id="constructionYear" min="1700" max="2100" step="1"/></label><label>Wohn-/Nutzfläche gesamt<input type="number" id="totalArea" min="0" step="1"/></label><label>Anzahl Einheiten<input type="number" id="unitCountDisplay" readonly/></label><div class="button-row full-width"><button type="button" id="openBoris">BORIS-BW öffnen</button><button type="button" id="openGeoportal">Geoportal Stuttgart öffnen</button></div></div></details><details class="section" open><summary><span>Bodenwert <span class="info-tooltip" data-tooltip="Bodenwert-Logik: BRW aus BORIS/Marktbericht übernehmen. Dann prüfen: passt die Richtwertzone zum Grundstück? Relevante Korrekturen sind Bewertungsstichtag/Zeitfaktor, WGFZ-/Lagefaktor und Aufteilung der Grundstücksfläche in Bauland, Garten-/Nebenfläche oder sonstige Flächen. Ergebnis: Bodenwert = angepasster BRW × gewichtete Fläche.">i</span></span><strong id="landSummary">–</strong></summary><div class="section-body grid three"><label>Aktueller BRW * <span class="info-tooltip" data-tooltip="Aktueller Bodenrichtwert in €/m² aus BORIS-BW bzw. Grundstücksmarktbericht. Wichtig: Richtwert bezieht sich auf ein typisches Richtwertgrundstück. Abweichungen bei WGFZ, Lage, Zuschnitt oder Nutzbarkeit müssen gesondert korrigiert werden.">i</span><input type="number" id="baseLandValuePerSqm" min="0" step="10" required/><small>€/m², aus BORIS</small></label><label>BRW-Zeitfaktor <span class="info-tooltip" data-tooltip="Zeitfaktor: falls der Bewertungsstichtag nach dem letzten BRW-Stichtag liegt, kann der BRW über historische BRW-Werte fortgeschrieben werden. Im Tool aktuell: linearer Trend aus Historie bis aktuellem BRW; ohne Historie Faktor 1,000.">i</span><input type="number" id="timeAdjustmentFactor" readonly/><small>automatisch: Historie oder 1,000</small></label><label>WGFZ-/Lagefaktor * <span class="info-tooltip" data-tooltip="Korrekturfaktor für wertrelevante Geschossfläche, Lage- oder Grundstücksmerkmale. Beispiel: Richtwertzone unterstellt andere WGFZ als tatsächlich zulässig oder vorhanden. Faktor >1 erhöht, Faktor <1 reduziert den BRW.">i</span><input type="number" id="landFeatureFactor" min="0" step="0.01" required/></label><div class="full-width history-block"><div class="section-title-inline"><strong>Historische BRW-Werte <span class="info-tooltip" data-tooltip="Optional: frühere Bodenrichtwerte eintragen. Daraus wird ein einfacher Trend für den BRW-Zeitfaktor abgeleitet. Ohne Historie wird nicht fortgeschrieben.">i</span></strong><button type="button" id="addBrwHistory">+ Jahr hinzufügen</button></div><div id="brwHistoryContainer" class="history-list"></div></div><label>Grundstücksfläche * <span class="info-tooltip" data-tooltip="Gesamtfläche des Flurstücks. Nicht jede Fläche muss voll mit dem BRW bewertet werden. Deshalb getrennt in Bauland, Garten-/Nebenfläche und ggf. sonstige Flächen denken.">i</span><input type="number" id="plotArea" min="0" step="1" required/><small>m²</small></label><label>wertrelevante Geschossfläche <span class="info-tooltip" data-tooltip="Wertrelevante Geschossfläche für WGFZ-Prüfung. WGFZ = wertrelevante Geschossfläche / Grundstücksfläche. Dient der Plausibilisierung des WGFZ-/Lagefaktors.">i</span><input type="number" id="relevantFloorArea" min="0" step="1"/><small>m², optional</small></label><label>WGFZ vorhanden<input type="number" id="actualWgfz" readonly/><small>automatisch</small></label><label>Baulandfläche * <span class="info-tooltip" data-tooltip="Flächenanteil, der voll als Bauland angesetzt wird. Typisch: überbaubare bzw. dem Bauland eindeutig zuzurechnende Grundstücksfläche. Gewichtung im Tool: 100 % des angepassten BRW.">i</span><input type="number" id="buildingLandArea" min="0" step="1" required/></label><label>Garten-/Nebenfläche <span class="info-tooltip" data-tooltip="Nicht voll baulich nutzbarer, aber hausnah nutzbarer Grundstücksanteil. Der Wertansatz erfolgt über den Gartenansatz, z. B. 0,10 bis 0,40 des angepassten BRW je nach Fall.">i</span><input type="number" id="gardenArea" min="0" step="1"/></label><label>Gartenansatz <span class="info-tooltip" data-tooltip="Faktor für Garten-/Nebenfläche. Beispiel: 0,40 bedeutet 40 % des angepassten BRW. Für PFG/Grün-/Restflächen kann ein deutlich niedrigerer Ansatz sinnvoll sein.">i</span><input type="number" id="gardenFactor" min="0" step="0.01"/></label><p class="hint full-width" id="brwTrendInfo">–</p></div></details><details class="section" open><summary><span>Ertrag</span><strong id="incomeSummary">–</strong></summary><div class="section-body"><div id="unitsContainer" class="units"></div><div class="button-row"><button type="button" id="addUnit">+ Einheit hinzufügen</button></div><div class="grid two compact-grid"><label>Bewirtschaftungskosten *<input type="number" id="operatingCostRate" min="0" step="0.1" required/><small>% vom Rohertrag</small></label></div></div></details><details class="section" open><summary><span>Restnutzungsdauer <span class="info-tooltip" data-tooltip="Vollständige RND-Rechenkette: Bewertungsjahr = Jahr des Bewertungsstichtags. Gebäudealter = Bewertungsjahr − Baujahr. Vorläufige RND = Gesamtnutzungsdauer − Gebäudealter. Dann Modernisierungspunkte je Gewerk addieren. Aus Gebäudealter, Gesamtnutzungsdauer und Punktsumme wird gemäß Grundstücksmarktbericht/ImmoWertA Anlage 2 ein Tabellenwert bzw. Faktor gezogen. Modifizierte RND = Tabellenwert nach Modernisierungsgrad, begrenzt durch die übliche Gesamtnutzungsdauer. Danach Kapitalisierungsfaktor/Vervielfältiger: q = 1 + p/100; V = (q^n − 1) / (q^n × p), mit p = Liegenschaftszins als Dezimalzahl und n = modifizierte RND.">i</span></span><strong><span id="modernizationPoints">0 / 20</span> · <span id="rndSummary">RND –</span></strong></summary><div class="section-body"><div class="grid three compact-grid"><label>Gesamtnutzungsdauer<input type="number" id="totalUsefulLife" min="20" max="100" step="1"/><small>Jahre</small></label><label>Restnutzungsdauer<input type="number" id="remainingLife" min="1" max="100" step="1" readonly/><small>automatisch berechnet</small></label><label>Modernisierungspunkte<input type="text" id="modernizationPointsDisplay" readonly/><small>Summe aus Slidern</small></label></div><div id="modernizationContainer" class="modernization-list"></div><p class="hint full-width info-formula" id="rndInfo">–</p></div></details><details class="section" open><summary><span>Modellparameter</span><strong id="modelSummary">–</strong></summary><div class="section-body grid two"><label>Liegenschaftszins * <span class="info-tooltip" data-tooltip="Orientierung aus Grundstücksmarktbericht Stuttgart 2024: reine MFH 1,5 %, MFH gewerblicher Mietanteil ≤20 % 1,4 %, MFH gewerblicher Mietanteil 21–50 % 2,1 %, gemischt genutzt >50 % Gewerbe 2,2 %, Geschäftshaus 3,7 %, Bürogebäude 3,6 %. Wert auswählen, Quelle dokumentieren und bei Bedarf objektspezifisch anpassen.">i</span><input type="number" id="propertyYield" min="0" step="0.1" required/><small>% p. a.</small></label><label>Quellnotiz<input id="propertyYieldNote" placeholder="z. B. GMB Stuttgart 2024, Tabelle 6.18, reines MFH"/><small>Herkunft / Tabelle / Objektsegment</small></label><div class="full-width history-block yield-box"><div class="section-title-inline"><strong>Liegenschaftszins-Richtwerte</strong><small>GMB Stuttgart 2024, bebaute Grundstücke</small></div><div class="yield-radio-list"><label class="yield-radio"><input type="radio" name="propertyYieldOption" value="1.5" data-yield-note="GMB Stuttgart 2024, reine MFH"><span>Reines Mehrfamilienhaus</span><strong>1,5 %</strong></label><label class="yield-radio"><input type="radio" name="propertyYieldOption" value="1.4" data-yield-note="GMB Stuttgart 2024, MFH gewerblicher Mietanteil ≤20 %"><span>MFH, Gewerbeanteil ≤ 20 %</span><strong>1,4 %</strong></label><label class="yield-radio"><input type="radio" name="propertyYieldOption" value="2.1" data-yield-note="GMB Stuttgart 2024, MFH gewerblicher Mietanteil 21–50 %"><span>MFH, Gewerbeanteil 21–50 %</span><strong>2,1 %</strong></label><label class="yield-radio"><input type="radio" name="propertyYieldOption" value="2.2" data-yield-note="GMB Stuttgart 2024, gemischt genutztes Gebäude >50 % Gewerbe"><span>Gemischt genutzt, Gewerbeanteil &gt; 50 %</span><strong>2,2 %</strong></label><label class="yield-radio"><input type="radio" name="propertyYieldOption" value="3.7" data-yield-note="GMB Stuttgart 2024, Geschäftshaus"><span>Geschäftshaus</span><strong>3,7 %</strong></label><label class="yield-radio"><input type="radio" name="propertyYieldOption" value="3.6" data-yield-note="GMB Stuttgart 2024, Bürogebäude"><span>Bürogebäude</span><strong>3,6 %</strong></label></div></div><label>Marktanpassung<input type="number" id="marketAdjustment" step="0.1"/><small>%</small></label></div></details><details class="section"><summary><span>boG / Risiken</span><strong id="bogSummary">–</strong></summary><div class="section-body grid two"><label>boG Abschläge<input type="number" id="bogDeductions" min="0" step="1000"/><small>€</small></label><label>boG Zuschläge<input type="number" id="bogAdditions" min="0" step="1000"/><small>€</small></label></div></details><details class="section"><summary><span>Ankauf</span><strong id="purchaseSummary">–</strong></summary><div class="section-body grid three"><label>Kaufpreisforderung<input type="number" id="purchasePrice" min="0" step="5000"/></label><label>Kaufnebenkosten<input type="number" id="purchaseCostsRate" min="0" step="0.1"/><small>%</small></label><label>Verhandlungspuffer<input type="number" id="negotiationBuffer" min="0" step="0.1"/><small>%</small></label></div></details></form><section class="panel results-panel"><h2>Ertragswert</h2><div class="result-list"><div><span>Angepasster BRW</span><strong id="adjustedBrw">–</strong></div><div><span>Bodenwert</span><strong id="landValue">–</strong></div><div><span>Jahresrohertrag</span><strong id="grossIncome">–</strong></div><div><span>Bewirtschaftungskosten</span><strong id="operatingCosts">–</strong></div><div><span>Jahresreinertrag</span><strong id="netIncome">–</strong></div><div><span>Bodenwertverzinsung</span><strong id="landInterest">–</strong></div><div><span>Gebäudereinertrag</span><strong id="buildingIncome">–</strong></div><div><span>Kapitalisierungsfaktor</span><strong id="multiplier">–</strong></div><div><span>Gebäudeertragswert</span><strong id="buildingValue">–</strong></div><div><span>Vorläufiger Ertragswert</span><strong id="preliminaryIncomeValue">–</strong></div><div><span>boG saldiert</span><strong id="bogTotal">–</strong></div><div><span>Ertragswert</span><strong id="incomeValue">–</strong></div></div><h2>Ankauf</h2><div class="result-list muted"><div><span>Ziel-Angebot</span><strong id="targetOffer">–</strong></div><div><span>Kaufpreis inkl. NK</span><strong id="totalAcquisitionCost">–</strong></div><div><span>Differenz inkl. NK</span><strong id="valueGap">–</strong></div><div><span>Kaufpreisfaktor</span><strong id="rentMultiplier">–</strong></div><div><span>Bruttorendite</span><strong id="grossYield">–</strong></div><div><span>Nettorendite</span><strong id="netYield">–</strong></div></div><p class="hint" id="verdict">–</p></section></section></main></section><section class="workspace-view" data-view="assetvalue"><main class="app"><section class="hero"><div><p class="eyebrow">Neues Bewertungsmodul</p><h1>Sachwertverfahren</h1><p class="subline">Platzhalter für EFH/ZFH und eigennutzungsorientierte Objekte. Nächster Ausbau: Bodenwert, NHK 2010, BGF, Baupreisindex, Alterswertminderung, Außenanlagen, boG und Sachwertfaktor.</p></div><div class="hero-card"><span>Sachwert</span><strong>geplant</strong><small>EFH/ZFH-Modul</small></div></section><section class="panel"><h2>Geplante Struktur</h2><div class="result-list"><div><span>Bodenwert</span><strong>aus Ertragswert-/Bodenwertblock wiederverwenden</strong></div><div><span>Gebäudetyp / NHK</span><strong>NHK 2010</strong></div><div><span>BGF / Baujahr / Standard</span><strong>Eingabe + Tooltip</strong></div><div><span>Alterswertminderung</span><strong>RND / GND</strong></div><div><span>Sachwertfaktor</span><strong>GMB Stuttgart</strong></div></div></section></main></section><section class="workspace-view" data-view="measurement"><div class="measurement-shell"><aside class="measurement-sidepanel"><div class="measurement-sidepanel-content"><p class="measurement-kicker">Datenerhebung</p><h2>Flächen & Linien erfassen</h2><div class="measurement-card"><strong>Workflow</strong><ol><li>PDF, Bild oder Geoportal-Screenshot laden</li><li>Maßstab setzen</li><li>Flächen und Linien messen</li><li>Kategorien vergeben</li><li>Später direkt in Bewertung übernehmen</li></ol></div><div class="measurement-card"><strong>Sinnvolle Kategorien</strong><ul><li>Bauland</li><li>Hausnaher Garten</li><li>PFG / Grünfläche</li><li>Baufenster</li><li>Gebäudegrundfläche</li><li>Abstandsflächen</li></ul></div></div></aside><div class="measurement-frame-wrap"><iframe src="messung.html" class="measurement-frame"></iframe></div></div></section></main><script src="app.js"></script><script src="ribbon.js"></script></body></html>
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ImmoWert – Analyse & Datenerhebung</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="top-ribbon">
+      <div class="ribbon-brand">
+        <span class="ribbon-eyebrow">ImmoWert</span
+        ><strong>Immobilienanalyse & Datenerhebung</strong>
+      </div>
+      <nav class="ribbon-tabs">
+        <button class="ribbon-tab active" data-switch-view="valuation">Ertragswert</button
+        ><button class="ribbon-tab" data-switch-view="assetvalue">Sachwert</button
+        ><button class="ribbon-tab" data-switch-view="measurement">Datenerhebung</button>
+      </nav>
+    </header>
+    <main class="workspace">
+      <section class="workspace-view active" data-view="valuation">
+        <main class="app">
+          <section class="hero">
+            <div>
+              <p class="eyebrow">ImmoWert · MVP</p>
+              <h1>Ertragswertverfahren</h1>
+              <p class="subline">
+                Bewertung, Bodenwertkorrektur und Datenerhebung in einem Workflow.
+              </p>
+            </div>
+            <div class="hero-card">
+              <span>Ertragswert</span><strong id="headlineValue">–</strong
+              ><small id="headlineMeta">–</small>
+            </div>
+          </section>
+          <section class="layout">
+            <form class="panel input-panel" id="valuationForm">
+              <div class="top-actions">
+                <button type="button" id="saveCase">Fall speichern</button
+                ><button type="button" id="resetCase">Standard laden</button
+                ><button type="button" id="copySummary">Kurzbewertung kopieren</button>
+              </div>
+              <details class="section" open>
+                <summary><span>Objekt</span><strong id="objectSummary">–</strong></summary>
+                <div class="section-body grid two">
+                  <label>Objektname *<input id="objectName" required /></label
+                  ><label>Adresse für BORIS-BW *<input id="borisAddress" required /></label
+                  ><label
+                    >Bewertungsstichtag *<input type="date" id="valuationDate" required /></label
+                  ><label
+                    >Baujahr<input
+                      type="number"
+                      id="constructionYear"
+                      min="1700"
+                      max="2100"
+                      step="1" /></label
+                  ><label
+                    >Wohn-/Nutzfläche gesamt<input
+                      type="number"
+                      id="totalArea"
+                      min="0"
+                      step="1" /></label
+                  ><label
+                    >Anzahl Einheiten<input type="number" id="unitCountDisplay" readonly
+                  /></label>
+                  <div class="button-row full-width">
+                    <button type="button" id="openBoris">BORIS-BW öffnen</button
+                    ><button type="button" id="openGeoportal">Geoportal Stuttgart öffnen</button>
+                  </div>
+                </div>
+              </details>
+              <details class="section" open>
+                <summary>
+                  <span
+                    >Bodenwert
+                    <span
+                      class="info-tooltip"
+                      data-tooltip="Bodenwert-Logik: BRW aus BORIS/Marktbericht übernehmen. Dann prüfen: passt die Richtwertzone zum Grundstück? Relevante Korrekturen sind Bewertungsstichtag/Zeitfaktor, WGFZ-/Lagefaktor und Aufteilung der Grundstücksfläche in Bauland, Garten-/Nebenfläche oder sonstige Flächen. Ergebnis: Bodenwert = angepasster BRW × gewichtete Fläche."
+                      >i</span
+                    ></span
+                  ><strong id="landSummary">–</strong>
+                </summary>
+                <div class="section-body grid three">
+                  <label
+                    >Aktueller BRW *
+                    <span
+                      class="info-tooltip"
+                      data-tooltip="Aktueller Bodenrichtwert in €/m² aus BORIS-BW bzw. Grundstücksmarktbericht. Wichtig: Richtwert bezieht sich auf ein typisches Richtwertgrundstück. Abweichungen bei WGFZ, Lage, Zuschnitt oder Nutzbarkeit müssen gesondert korrigiert werden."
+                      >i</span
+                    ><input
+                      type="number"
+                      id="baseLandValuePerSqm"
+                      min="0"
+                      step="10"
+                      required
+                    /><small>€/m², aus BORIS</small></label
+                  ><label
+                    >BRW-Zeitfaktor
+                    <span
+                      class="info-tooltip"
+                      data-tooltip="Zeitfaktor: falls der Bewertungsstichtag nach dem letzten BRW-Stichtag liegt, kann der BRW über historische BRW-Werte fortgeschrieben werden. Im Tool aktuell: linearer Trend aus Historie bis aktuellem BRW; ohne Historie Faktor 1,000."
+                      >i</span
+                    ><input type="number" id="timeAdjustmentFactor" readonly /><small
+                      >automatisch: Historie oder 1,000</small
+                    ></label
+                  ><label
+                    >WGFZ-/Lagefaktor *
+                    <span
+                      class="info-tooltip"
+                      data-tooltip="Korrekturfaktor für wertrelevante Geschossfläche, Lage- oder Grundstücksmerkmale. Beispiel: Richtwertzone unterstellt andere WGFZ als tatsächlich zulässig oder vorhanden. Faktor >1 erhöht, Faktor <1 reduziert den BRW."
+                      >i</span
+                    ><input type="number" id="landFeatureFactor" min="0" step="0.01" required
+                  /></label>
+                  <div class="full-width history-block">
+                    <div class="section-title-inline">
+                      <strong
+                        >Historische BRW-Werte
+                        <span
+                          class="info-tooltip"
+                          data-tooltip="Optional: frühere Bodenrichtwerte eintragen. Daraus wird ein einfacher Trend für den BRW-Zeitfaktor abgeleitet. Ohne Historie wird nicht fortgeschrieben."
+                          >i</span
+                        ></strong
+                      ><button type="button" id="addBrwHistory">+ Jahr hinzufügen</button>
+                    </div>
+                    <div id="brwHistoryContainer" class="history-list"></div>
+                  </div>
+                  <label
+                    >Grundstücksfläche *
+                    <span
+                      class="info-tooltip"
+                      data-tooltip="Gesamtfläche des Flurstücks. Nicht jede Fläche muss voll mit dem BRW bewertet werden. Deshalb getrennt in Bauland, Garten-/Nebenfläche und ggf. sonstige Flächen denken."
+                      >i</span
+                    ><input type="number" id="plotArea" min="0" step="1" required /><small
+                      >m²</small
+                    ></label
+                  ><label
+                    >wertrelevante Geschossfläche
+                    <span
+                      class="info-tooltip"
+                      data-tooltip="Wertrelevante Geschossfläche für WGFZ-Prüfung. WGFZ = wertrelevante Geschossfläche / Grundstücksfläche. Dient der Plausibilisierung des WGFZ-/Lagefaktors."
+                      >i</span
+                    ><input type="number" id="relevantFloorArea" min="0" step="1" /><small
+                      >m², optional</small
+                    ></label
+                  ><label
+                    >WGFZ vorhanden<input type="number" id="actualWgfz" readonly /><small
+                      >automatisch</small
+                    ></label
+                  ><label
+                    >Baulandfläche *
+                    <span
+                      class="info-tooltip"
+                      data-tooltip="Flächenanteil, der voll als Bauland angesetzt wird. Typisch: überbaubare bzw. dem Bauland eindeutig zuzurechnende Grundstücksfläche. Gewichtung im Tool: 100 % des angepassten BRW."
+                      >i</span
+                    ><input type="number" id="buildingLandArea" min="0" step="1" required /></label
+                  ><label
+                    >Garten-/Nebenfläche
+                    <span
+                      class="info-tooltip"
+                      data-tooltip="Nicht voll baulich nutzbarer, aber hausnah nutzbarer Grundstücksanteil. Der Wertansatz erfolgt über den Gartenansatz, z. B. 0,10 bis 0,40 des angepassten BRW je nach Fall."
+                      >i</span
+                    ><input type="number" id="gardenArea" min="0" step="1" /></label
+                  ><label
+                    >Gartenansatz
+                    <span
+                      class="info-tooltip"
+                      data-tooltip="Faktor für Garten-/Nebenfläche. Beispiel: 0,40 bedeutet 40 % des angepassten BRW. Für PFG/Grün-/Restflächen kann ein deutlich niedrigerer Ansatz sinnvoll sein."
+                      >i</span
+                    ><input type="number" id="gardenFactor" min="0" step="0.01"
+                  /></label>
+                  <p class="hint full-width" id="brwTrendInfo">–</p>
+                </div>
+              </details>
+              <details class="section" open>
+                <summary><span>Ertrag</span><strong id="incomeSummary">–</strong></summary>
+                <div class="section-body">
+                  <div id="unitsContainer" class="units"></div>
+                  <div class="button-row">
+                    <button type="button" id="addUnit">+ Einheit hinzufügen</button>
+                  </div>
+                  <div class="grid two compact-grid">
+                    <label
+                      >Bewirtschaftungskosten *<input
+                        type="number"
+                        id="operatingCostRate"
+                        min="0"
+                        step="0.1"
+                        required
+                      /><small>% vom Rohertrag</small></label
+                    >
+                  </div>
+                </div>
+              </details>
+              <details class="section" open>
+                <summary>
+                  <span
+                    >Restnutzungsdauer
+                    <span
+                      class="info-tooltip"
+                      data-tooltip="Vollständige RND-Rechenkette: Bewertungsjahr = Jahr des Bewertungsstichtags. Gebäudealter = Bewertungsjahr − Baujahr. Vorläufige RND = Gesamtnutzungsdauer − Gebäudealter. Dann Modernisierungspunkte je Gewerk addieren. Aus Gebäudealter, Gesamtnutzungsdauer und Punktsumme wird gemäß Grundstücksmarktbericht/ImmoWertA Anlage 2 ein Tabellenwert bzw. Faktor gezogen. Modifizierte RND = Tabellenwert nach Modernisierungsgrad, begrenzt durch die übliche Gesamtnutzungsdauer. Danach Kapitalisierungsfaktor/Vervielfältiger: q = 1 + p/100; V = (q^n − 1) / (q^n × p), mit p = Liegenschaftszins als Dezimalzahl und n = modifizierte RND."
+                      >i</span
+                    ></span
+                  ><strong
+                    ><span id="modernizationPoints">0 / 20</span> ·
+                    <span id="rndSummary">RND –</span></strong
+                  >
+                </summary>
+                <div class="section-body">
+                  <div class="grid three compact-grid">
+                    <label
+                      >Gesamtnutzungsdauer<input
+                        type="number"
+                        id="totalUsefulLife"
+                        min="20"
+                        max="100"
+                        step="1"
+                      /><small>Jahre</small></label
+                    ><label
+                      >Restnutzungsdauer<input
+                        type="number"
+                        id="remainingLife"
+                        min="1"
+                        max="100"
+                        step="1"
+                        readonly
+                      /><small>automatisch berechnet</small></label
+                    ><label
+                      >Modernisierungspunkte<input
+                        type="text"
+                        id="modernizationPointsDisplay"
+                        readonly
+                      /><small>Summe aus Slidern</small></label
+                    >
+                  </div>
+                  <div id="modernizationContainer" class="modernization-list"></div>
+                  <p class="hint full-width info-formula" id="rndInfo">–</p>
+                </div>
+              </details>
+              <details class="section" open>
+                <summary><span>Modellparameter</span><strong id="modelSummary">–</strong></summary>
+                <div class="section-body grid two">
+                  <label
+                    >Liegenschaftszins *
+                    <span
+                      class="info-tooltip"
+                      data-tooltip="Orientierung aus Grundstücksmarktbericht Stuttgart 2024: reine MFH 1,5 %, MFH gewerblicher Mietanteil ≤20 % 1,4 %, MFH gewerblicher Mietanteil 21–50 % 2,1 %, gemischt genutzt >50 % Gewerbe 2,2 %, Geschäftshaus 3,7 %, Bürogebäude 3,6 %. Wert auswählen, Quelle dokumentieren und bei Bedarf objektspezifisch anpassen."
+                      >i</span
+                    ><input type="number" id="propertyYield" min="0" step="0.1" required /><small
+                      >% p. a.</small
+                    ></label
+                  ><label
+                    >Quellnotiz<input
+                      id="propertyYieldNote"
+                      placeholder="z. B. GMB Stuttgart 2024, Tabelle 6.18, reines MFH"
+                    /><small>Herkunft / Tabelle / Objektsegment</small></label
+                  >
+                  <div class="full-width history-block yield-box">
+                    <div class="section-title-inline">
+                      <strong>Liegenschaftszins-Richtwerte</strong
+                      ><small>GMB Stuttgart 2024, bebaute Grundstücke</small>
+                    </div>
+                    <div class="yield-radio-list">
+                      <label class="yield-radio"
+                        ><input
+                          type="radio"
+                          name="propertyYieldOption"
+                          value="1.5"
+                          data-yield-note="GMB Stuttgart 2024, reine MFH"
+                        /><span>Reines Mehrfamilienhaus</span><strong>1,5 %</strong></label
+                      ><label class="yield-radio"
+                        ><input
+                          type="radio"
+                          name="propertyYieldOption"
+                          value="1.4"
+                          data-yield-note="GMB Stuttgart 2024, MFH gewerblicher Mietanteil ≤20 %"
+                        /><span>MFH, Gewerbeanteil ≤ 20 %</span><strong>1,4 %</strong></label
+                      ><label class="yield-radio"
+                        ><input
+                          type="radio"
+                          name="propertyYieldOption"
+                          value="2.1"
+                          data-yield-note="GMB Stuttgart 2024, MFH gewerblicher Mietanteil 21–50 %"
+                        /><span>MFH, Gewerbeanteil 21–50 %</span><strong>2,1 %</strong></label
+                      ><label class="yield-radio"
+                        ><input
+                          type="radio"
+                          name="propertyYieldOption"
+                          value="2.2"
+                          data-yield-note="GMB Stuttgart 2024, gemischt genutztes Gebäude >50 % Gewerbe"
+                        /><span>Gemischt genutzt, Gewerbeanteil &gt; 50 %</span
+                        ><strong>2,2 %</strong></label
+                      ><label class="yield-radio"
+                        ><input
+                          type="radio"
+                          name="propertyYieldOption"
+                          value="3.7"
+                          data-yield-note="GMB Stuttgart 2024, Geschäftshaus"
+                        /><span>Geschäftshaus</span><strong>3,7 %</strong></label
+                      ><label class="yield-radio"
+                        ><input
+                          type="radio"
+                          name="propertyYieldOption"
+                          value="3.6"
+                          data-yield-note="GMB Stuttgart 2024, Bürogebäude"
+                        /><span>Bürogebäude</span><strong>3,6 %</strong></label
+                      >
+                    </div>
+                  </div>
+                  <label
+                    >Marktanpassung<input type="number" id="marketAdjustment" step="0.1" /><small
+                      >%</small
+                    ></label
+                  >
+                </div>
+              </details>
+              <details class="section">
+                <summary><span>boG / Risiken</span><strong id="bogSummary">–</strong></summary>
+                <div class="section-body grid two">
+                  <label
+                    >boG Abschläge<input
+                      type="number"
+                      id="bogDeductions"
+                      min="0"
+                      step="1000"
+                    /><small>€</small></label
+                  ><label
+                    >boG Zuschläge<input
+                      type="number"
+                      id="bogAdditions"
+                      min="0"
+                      step="1000"
+                    /><small>€</small></label
+                  >
+                </div>
+              </details>
+              <details class="section">
+                <summary><span>Ankauf</span><strong id="purchaseSummary">–</strong></summary>
+                <div class="section-body grid three">
+                  <label
+                    >Kaufpreisforderung<input
+                      type="number"
+                      id="purchasePrice"
+                      min="0"
+                      step="5000" /></label
+                  ><label
+                    >Kaufnebenkosten<input
+                      type="number"
+                      id="purchaseCostsRate"
+                      min="0"
+                      step="0.1"
+                    /><small>%</small></label
+                  ><label
+                    >Verhandlungspuffer<input
+                      type="number"
+                      id="negotiationBuffer"
+                      min="0"
+                      step="0.1"
+                    /><small>%</small></label
+                  >
+                </div>
+              </details>
+            </form>
+            <section class="panel results-panel">
+              <h2>Ertragswert</h2>
+              <div class="result-list">
+                <div><span>Angepasster BRW</span><strong id="adjustedBrw">–</strong></div>
+                <div><span>Bodenwert</span><strong id="landValue">–</strong></div>
+                <div><span>Jahresrohertrag</span><strong id="grossIncome">–</strong></div>
+                <div><span>Bewirtschaftungskosten</span><strong id="operatingCosts">–</strong></div>
+                <div><span>Jahresreinertrag</span><strong id="netIncome">–</strong></div>
+                <div><span>Bodenwertverzinsung</span><strong id="landInterest">–</strong></div>
+                <div><span>Gebäudereinertrag</span><strong id="buildingIncome">–</strong></div>
+                <div><span>Kapitalisierungsfaktor</span><strong id="multiplier">–</strong></div>
+                <div><span>Gebäudeertragswert</span><strong id="buildingValue">–</strong></div>
+                <div>
+                  <span>Vorläufiger Ertragswert</span><strong id="preliminaryIncomeValue">–</strong>
+                </div>
+                <div><span>boG saldiert</span><strong id="bogTotal">–</strong></div>
+                <div><span>Ertragswert</span><strong id="incomeValue">–</strong></div>
+              </div>
+              <h2>Ankauf</h2>
+              <div class="result-list muted">
+                <div><span>Ziel-Angebot</span><strong id="targetOffer">–</strong></div>
+                <div>
+                  <span>Kaufpreis inkl. NK</span><strong id="totalAcquisitionCost">–</strong>
+                </div>
+                <div><span>Differenz inkl. NK</span><strong id="valueGap">–</strong></div>
+                <div><span>Kaufpreisfaktor</span><strong id="rentMultiplier">–</strong></div>
+                <div><span>Bruttorendite</span><strong id="grossYield">–</strong></div>
+                <div><span>Nettorendite</span><strong id="netYield">–</strong></div>
+              </div>
+              <p class="hint" id="verdict">–</p>
+            </section>
+          </section>
+        </main>
+      </section>
+      <section class="workspace-view" data-view="assetvalue">
+        <main class="app">
+          <section class="hero">
+            <div>
+              <p class="eyebrow">Neues Bewertungsmodul</p>
+              <h1>Sachwertverfahren</h1>
+              <p class="subline">
+                Platzhalter für EFH/ZFH und eigennutzungsorientierte Objekte. Nächster Ausbau:
+                Bodenwert, NHK 2010, BGF, Baupreisindex, Alterswertminderung, Außenanlagen, boG und
+                Sachwertfaktor.
+              </p>
+            </div>
+            <div class="hero-card">
+              <span>Sachwert</span><strong>geplant</strong><small>EFH/ZFH-Modul</small>
+            </div>
+          </section>
+          <section class="panel">
+            <h2>Geplante Struktur</h2>
+            <div class="result-list">
+              <div>
+                <span>Bodenwert</span
+                ><strong>aus Ertragswert-/Bodenwertblock wiederverwenden</strong>
+              </div>
+              <div><span>Gebäudetyp / NHK</span><strong>NHK 2010</strong></div>
+              <div><span>BGF / Baujahr / Standard</span><strong>Eingabe + Tooltip</strong></div>
+              <div><span>Alterswertminderung</span><strong>RND / GND</strong></div>
+              <div><span>Sachwertfaktor</span><strong>GMB Stuttgart</strong></div>
+            </div>
+          </section>
+        </main>
+      </section>
+      <section class="workspace-view" data-view="measurement">
+        <div class="measurement-shell">
+          <aside class="measurement-sidepanel">
+            <div class="measurement-sidepanel-content">
+              <p class="measurement-kicker">Datenerhebung</p>
+              <h2>Flächen & Linien erfassen</h2>
+              <div class="measurement-card">
+                <strong>Workflow</strong>
+                <ol>
+                  <li>PDF, Bild oder Geoportal-Screenshot laden</li>
+                  <li>Maßstab setzen</li>
+                  <li>Flächen und Linien messen</li>
+                  <li>Kategorien vergeben</li>
+                  <li>Später direkt in Bewertung übernehmen</li>
+                </ol>
+              </div>
+              <div class="measurement-card">
+                <strong>Sinnvolle Kategorien</strong>
+                <ul>
+                  <li>Bauland</li>
+                  <li>Hausnaher Garten</li>
+                  <li>PFG / Grünfläche</li>
+                  <li>Baufenster</li>
+                  <li>Gebäudegrundfläche</li>
+                  <li>Abstandsflächen</li>
+                </ul>
+              </div>
+            </div>
+          </aside>
+          <div class="measurement-frame-wrap">
+            <iframe src="messung.html" class="measurement-frame"></iframe>
+          </div>
+        </div>
+      </section>
+    </main>
+    <script src="app.js"></script>
+    <script src="ribbon.js"></script>
+  </body>
+</html>

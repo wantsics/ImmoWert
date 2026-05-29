@@ -12,19 +12,53 @@
       "optionalInputs": ["gardenArea", "gardenFactor", "manualLocationFactor"],
       "formula": "BRW_adj = BRW × Zeitfaktor × UK(WGFZ_ist) / UK(WGFZ_soll) × sonstiger Faktor",
       "tables": {
-        "lowrise": [[0.3,0.69],[0.4,0.75],[0.5,0.80],[0.6,0.84],[0.7,0.88],[0.8,0.92],[0.9,0.96],[1.0,1.00],[1.1,1.05]],
-        "multi": [[0.8,0.94],[0.9,0.97],[1.0,1.00],[1.1,1.03],[1.2,1.07],[1.3,1.10],[1.4,1.14],[1.5,1.18],[1.6,1.22],[1.7,1.27],[1.8,1.31],[1.9,1.36],[2.0,1.41],[2.1,1.46],[2.2,1.51],[2.3,1.56],[2.4,1.61]]
+        "lowrise": [
+          [0.3, 0.69],
+          [0.4, 0.75],
+          [0.5, 0.8],
+          [0.6, 0.84],
+          [0.7, 0.88],
+          [0.8, 0.92],
+          [0.9, 0.96],
+          [1.0, 1.0],
+          [1.1, 1.05]
+        ],
+        "multi": [
+          [0.8, 0.94],
+          [0.9, 0.97],
+          [1.0, 1.0],
+          [1.1, 1.03],
+          [1.2, 1.07],
+          [1.3, 1.1],
+          [1.4, 1.14],
+          [1.5, 1.18],
+          [1.6, 1.22],
+          [1.7, 1.27],
+          [1.8, 1.31],
+          [1.9, 1.36],
+          [2.0, 1.41],
+          [2.1, 1.46],
+          [2.2, 1.51],
+          [2.3, 1.56],
+          [2.4, 1.61]
+        ]
       },
       "interpolation": "linear",
-      "notes": ["Bei übergroßen Grundstücken Bauplatzfläche, Mehrfläche und hausnaher Garten separat prüfen."]
+      "notes": [
+        "Bei übergroßen Grundstücken Bauplatzfläche, Mehrfläche und hausnaher Garten separat prüfen."
+      ]
     },
     "yields": [
-      {"id":"mfh","label":"Reines Mehrfamilienhaus","yieldPercent":1.5},
-      {"id":"mfh_commercial_20","label":"MFH Gewerbeanteil ≤ 20 %","yieldPercent":1.4},
-      {"id":"mfh_commercial_21_50","label":"MFH Gewerbeanteil 21–50 %","yieldPercent":2.1},
-      {"id":"mixed_commercial_gt_50","label":"Gemischt genutzt, Gewerbeanteil > 50 %","yieldPercent":2.2},
-      {"id":"retail","label":"Geschäftshaus","yieldPercent":3.7},
-      {"id":"office","label":"Bürogebäude","yieldPercent":3.6}
+      { "id": "mfh", "label": "Reines Mehrfamilienhaus", "yieldPercent": 1.5 },
+      { "id": "mfh_commercial_20", "label": "MFH Gewerbeanteil ≤ 20 %", "yieldPercent": 1.4 },
+      { "id": "mfh_commercial_21_50", "label": "MFH Gewerbeanteil 21–50 %", "yieldPercent": 2.1 },
+      {
+        "id": "mixed_commercial_gt_50",
+        "label": "Gemischt genutzt, Gewerbeanteil > 50 %",
+        "yieldPercent": 2.2
+      },
+      { "id": "retail", "label": "Geschäftshaus", "yieldPercent": 3.7 },
+      { "id": "office", "label": "Bürogebäude", "yieldPercent": 3.6 }
     ]
   },
   {
@@ -42,9 +76,9 @@
       "optionalInputs": ["gardenArea", "gardenFactor", "manualLocationFactor"],
       "disabledInputs": ["wgfzSoll", "relevantFloorArea", "wgfzCorrectionFactor"],
       "formula": "BRW_adj = BRW × Zeitfaktor × sonstiger sachverständiger Faktor; keine Regel-WGFZ-Umrechnung im individuellen Wohnungsbau",
-      "greenLandFactorDefault": 0.10,
+      "greenLandFactorDefault": 0.1,
       "privateRoadFactor": 0.25,
-      "garagePlotFactor": 0.50,
+      "garagePlotFactor": 0.5,
       "notes": [
         "Umrechnungskoeffizienten nach §19 ImmoWertV wurden im Geltungsbereich bisher nicht abgeleitet.",
         "Beim individuellen Wohnungsbau ist i.d.R. keine Abhängigkeit vom Maß der baulichen Nutzung erkennbar; keine wGFZ-Umrechnung.",
@@ -54,22 +88,64 @@
       ]
     },
     "yields": [
-      {"id":"etw_lt_35","label":"Wohnung bis 35 m² WFL","yieldPercent":1.6,"count":17},
-      {"id":"etw_36_60","label":"Wohnung 36–60 m² WFL","yieldPercent":0.9,"count":53},
-      {"id":"etw_61_80","label":"Wohnung 61–80 m² WFL","yieldPercent":0.7,"count":39},
-      {"id":"etw_81_100","label":"Wohnung 81–100 m² WFL","yieldPercent":0.5,"count":14},
-      {"id":"etw_gt_101","label":"Wohnung über 101 m² WFL","yieldPercent":1.0,"count":9},
-      {"id":"efh_zfh","label":"Ein- und Zweifamilienhaus","yieldPercent":1.0,"count":45,"factorMean":28.9},
-      {"id":"three_four_family","label":"Drei- und Vierfamilienhaus","yieldPercent":1.2,"count":25,"factorMean":24.9},
-      {"id":"mfh_5_20","label":"5–20-Familienhaus","yieldPercent":1.9,"count":9,"factorMean":21.2},
-      {"id":"office_practice","label":"Büro / Praxis","yieldPercent":2.9,"count":10,"factorMean":19.2},
-      {"id":"trade_shop","label":"Handel / Laden","yieldPercent":3.2,"count":16,"factorMean":16.5},
-      {"id":"gastronomy","label":"Gastronomie","yieldPercent":4.4,"count":3,"factorMean":14.8},
-      {"id":"production_storage","label":"Produktion / Werkstatt / Lager","yieldPercent":4.1,"count":6,"factorMean":17.2}
+      { "id": "etw_lt_35", "label": "Wohnung bis 35 m² WFL", "yieldPercent": 1.6, "count": 17 },
+      { "id": "etw_36_60", "label": "Wohnung 36–60 m² WFL", "yieldPercent": 0.9, "count": 53 },
+      { "id": "etw_61_80", "label": "Wohnung 61–80 m² WFL", "yieldPercent": 0.7, "count": 39 },
+      { "id": "etw_81_100", "label": "Wohnung 81–100 m² WFL", "yieldPercent": 0.5, "count": 14 },
+      { "id": "etw_gt_101", "label": "Wohnung über 101 m² WFL", "yieldPercent": 1.0, "count": 9 },
+      {
+        "id": "efh_zfh",
+        "label": "Ein- und Zweifamilienhaus",
+        "yieldPercent": 1.0,
+        "count": 45,
+        "factorMean": 28.9
+      },
+      {
+        "id": "three_four_family",
+        "label": "Drei- und Vierfamilienhaus",
+        "yieldPercent": 1.2,
+        "count": 25,
+        "factorMean": 24.9
+      },
+      {
+        "id": "mfh_5_20",
+        "label": "5–20-Familienhaus",
+        "yieldPercent": 1.9,
+        "count": 9,
+        "factorMean": 21.2
+      },
+      {
+        "id": "office_practice",
+        "label": "Büro / Praxis",
+        "yieldPercent": 2.9,
+        "count": 10,
+        "factorMean": 19.2
+      },
+      {
+        "id": "trade_shop",
+        "label": "Handel / Laden",
+        "yieldPercent": 3.2,
+        "count": 16,
+        "factorMean": 16.5
+      },
+      {
+        "id": "gastronomy",
+        "label": "Gastronomie",
+        "yieldPercent": 4.4,
+        "count": 3,
+        "factorMean": 14.8
+      },
+      {
+        "id": "production_storage",
+        "label": "Produktion / Werkstatt / Lager",
+        "yieldPercent": 4.1,
+        "count": 6,
+        "factorMean": 17.2
+      }
     ],
     "assetValue": {
       "regionalFactor": 1.0,
-      "outsideFacilitiesMinimum": {"rowHouse":10000,"detachedOrSemiDetached":12000},
+      "outsideFacilitiesMinimum": { "rowHouse": 10000, "detachedOrSemiDetached": 12000 },
       "modelNotes": [
         "NHK 2010, Bundesbauindex, Gebäudestandard nach Anlage 4 ImmoWertV 2021.",
         "Gesamt- und Restnutzungsdauer weiterhin nach Sachwertrichtlinie 2012 / standardabhängiger GND.",
@@ -77,8 +153,21 @@
       ]
     },
     "comparisonValue": {
-      "efhZfhPlotSizeFactor": [[170,399,0.926],[400,499,0.963],[500,599,1.000],[600,699,1.037],[700,799,1.074],[800,null,1.110]],
-      "efhZfhBaujahrFactor": [[1960,1974,0.871],[1975,1984,1.000],[1985,1994,1.129],[1995,2004,1.258],[2005,2022,1.387]],
+      "efhZfhPlotSizeFactor": [
+        [170, 399, 0.926],
+        [400, 499, 0.963],
+        [500, 599, 1.0],
+        [600, 699, 1.037],
+        [700, 799, 1.074],
+        [800, null, 1.11]
+      ],
+      "efhZfhBaujahrFactor": [
+        [1960, 1974, 0.871],
+        [1975, 1984, 1.0],
+        [1985, 1994, 1.129],
+        [1995, 2004, 1.258],
+        [2005, 2022, 1.387]
+      ],
       "note": "Diese Grundstücksgrößenfaktoren sind Vergleichswertfaktoren für EFH/ZFH, nicht automatisch Bodenwertkorrekturen."
     }
   },
@@ -125,10 +214,34 @@
       "unbuiltResidentialLand2021AvgEuroSqm": 1215,
       "unbuiltCommercialLand2021AvgEuroSqm": 425,
       "builtObjects2021": {
-        "rowHouse": {"count": 7, "meanPriceEuro": 639000, "meanPlotSqm": 257, "meanLivingAreaSqm": 144, "meanEuroSqmLiving": 4429},
-        "semiDetached": {"count": 7, "meanPriceEuro": 649500, "meanPlotSqm": 246, "meanLivingAreaSqm": 139, "meanEuroSqmLiving": 4663},
-        "oneTwoFamily": {"count": 14, "meanPriceEuro": 750739, "meanPlotSqm": 472, "meanLivingAreaSqm": 167, "meanEuroSqmLiving": 4503},
-        "threeFourFamily": {"count": 16, "meanPriceEuro": 920509, "meanPlotSqm": 390, "meanLivingAreaSqm": 223, "meanEuroSqmLiving": 4121}
+        "rowHouse": {
+          "count": 7,
+          "meanPriceEuro": 639000,
+          "meanPlotSqm": 257,
+          "meanLivingAreaSqm": 144,
+          "meanEuroSqmLiving": 4429
+        },
+        "semiDetached": {
+          "count": 7,
+          "meanPriceEuro": 649500,
+          "meanPlotSqm": 246,
+          "meanLivingAreaSqm": 139,
+          "meanEuroSqmLiving": 4663
+        },
+        "oneTwoFamily": {
+          "count": 14,
+          "meanPriceEuro": 750739,
+          "meanPlotSqm": 472,
+          "meanLivingAreaSqm": 167,
+          "meanEuroSqmLiving": 4503
+        },
+        "threeFourFamily": {
+          "count": 16,
+          "meanPriceEuro": 920509,
+          "meanPlotSqm": 390,
+          "meanLivingAreaSqm": 223,
+          "meanEuroSqmLiving": 4121
+        }
       },
       "parking2021": {
         "newUndergroundParkingMeanEuro": 26418,

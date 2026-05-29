@@ -42,6 +42,7 @@ Verbleibende wirtschaftliche Nutzungsdauer des Gebäudes.
 Besondere objektspezifische Grundstücksmerkmale.
 
 Beispiele:
+
 - Bauschäden
 - Rechte
 - Altlasten

@@ -15,17 +15,59 @@ function todayIsoDate() {
 }
 
 const MODERNIZATION_ELEMENTS = [
-  { id: 'roof', label: 'Dacherneuerung inkl. Wärmedämmung', max: 4, info: 'Dach inkl. Dämmung: bis 5 Jahre = 4 Punkte, 6–10 Jahre = 3 Punkte, 11–15 Jahre = 2 Punkte, 16–20 Jahre = 1 Punkt, älter/nicht modernisiert = 0 Punkte.' },
-  { id: 'windows', label: 'Fenster und Außentüren', max: 2, info: 'Fenster/Außentüren: bis 10 Jahre = 2 Punkte, 11–20 Jahre = 1 Punkt, älter/nicht modernisiert = 0 Punkte.' },
-  { id: 'systems', label: 'Leitungssysteme Strom/Gas/Wasser/Abwasser', max: 2, info: 'Leitungssysteme: umfassend erneuert = 2 Punkte, teilweise/älter modernisiert = 1 Punkt, nicht modernisiert = 0 Punkte. Modellkonform zum Marktbericht prüfen.' },
-  { id: 'heating', label: 'Heizungsanlage', max: 2, info: 'Heizung: bis 10 Jahre = 2 Punkte, 11–20 Jahre = 1 Punkt, älter/nicht modernisiert = 0 Punkte.' },
-  { id: 'facade', label: 'Wärmedämmung Außenwände', max: 4, info: 'Außenwanddämmung: bis 5 Jahre = 4 Punkte, 6–10 Jahre = 3 Punkte, 11–15 Jahre = 2 Punkte, 16–20 Jahre = 1 Punkt, älter/nicht modernisiert = 0 Punkte.' },
-  { id: 'bath', label: 'Bäder', max: 2, info: 'Bäder: modern/umfassend erneuert = 2 Punkte, teilweise/älter modernisiert = 1 Punkt, nicht modernisiert = 0 Punkte.' },
-  { id: 'interior', label: 'Innenausbau Decken/Fußböden/Treppen', max: 2, info: 'Innenausbau: umfassend modernisiert = 2 Punkte, teilweise modernisiert = 1 Punkt, nicht modernisiert = 0 Punkte.' },
-  { id: 'layout', label: 'wesentliche Grundrissverbesserung', max: 2, info: 'Grundrissverbesserung: wesentliche Verbesserung = 1–2 Punkte. Keine zeitabhängige Bauteilmodernisierung, sondern funktionaler Eingriff.' },
+  {
+    id: 'roof',
+    label: 'Dacherneuerung inkl. Wärmedämmung',
+    max: 4,
+    info: 'Dach inkl. Dämmung: bis 5 Jahre = 4 Punkte, 6–10 Jahre = 3 Punkte, 11–15 Jahre = 2 Punkte, 16–20 Jahre = 1 Punkt, älter/nicht modernisiert = 0 Punkte.',
+  },
+  {
+    id: 'windows',
+    label: 'Fenster und Außentüren',
+    max: 2,
+    info: 'Fenster/Außentüren: bis 10 Jahre = 2 Punkte, 11–20 Jahre = 1 Punkt, älter/nicht modernisiert = 0 Punkte.',
+  },
+  {
+    id: 'systems',
+    label: 'Leitungssysteme Strom/Gas/Wasser/Abwasser',
+    max: 2,
+    info: 'Leitungssysteme: umfassend erneuert = 2 Punkte, teilweise/älter modernisiert = 1 Punkt, nicht modernisiert = 0 Punkte. Modellkonform zum Marktbericht prüfen.',
+  },
+  {
+    id: 'heating',
+    label: 'Heizungsanlage',
+    max: 2,
+    info: 'Heizung: bis 10 Jahre = 2 Punkte, 11–20 Jahre = 1 Punkt, älter/nicht modernisiert = 0 Punkte.',
+  },
+  {
+    id: 'facade',
+    label: 'Wärmedämmung Außenwände',
+    max: 4,
+    info: 'Außenwanddämmung: bis 5 Jahre = 4 Punkte, 6–10 Jahre = 3 Punkte, 11–15 Jahre = 2 Punkte, 16–20 Jahre = 1 Punkt, älter/nicht modernisiert = 0 Punkte.',
+  },
+  {
+    id: 'bath',
+    label: 'Bäder',
+    max: 2,
+    info: 'Bäder: modern/umfassend erneuert = 2 Punkte, teilweise/älter modernisiert = 1 Punkt, nicht modernisiert = 0 Punkte.',
+  },
+  {
+    id: 'interior',
+    label: 'Innenausbau Decken/Fußböden/Treppen',
+    max: 2,
+    info: 'Innenausbau: umfassend modernisiert = 2 Punkte, teilweise modernisiert = 1 Punkt, nicht modernisiert = 0 Punkte.',
+  },
+  {
+    id: 'layout',
+    label: 'wesentliche Grundrissverbesserung',
+    max: 2,
+    info: 'Grundrissverbesserung: wesentliche Verbesserung = 1–2 Punkte. Keine zeitabhängige Bauteilmodernisierung, sondern funktionaler Eingriff.',
+  },
 ];
 
-const DEFAULT_MODERNIZATION = Object.fromEntries(MODERNIZATION_ELEMENTS.map((item) => [item.id, 0]));
+const DEFAULT_MODERNIZATION = Object.fromEntries(
+  MODERNIZATION_ELEMENTS.map((item) => [item.id, 0]),
+);
 
 const DEFAULT_CASE = {
   objectName: 'Neues Objekt',
@@ -56,7 +98,9 @@ const DEFAULT_CASE = {
 
 let brwHistory = [];
 let modernization = { ...DEFAULT_MODERNIZATION };
-let units = [{ name: 'Einheit 1', area: 0, rentMode: 'sqm', rentPerSqm: 0, monthlyRent: 0, factor: 1 }];
+let units = [
+  { name: 'Einheit 1', area: 0, rentMode: 'sqm', rentPerSqm: 0, monthlyRent: 0, factor: 1 },
+];
 
 function numberValue(id) {
   const element = document.getElementById(id);
@@ -79,7 +123,11 @@ function setText(id, value) {
 }
 
 function euro(value) {
-  return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value || 0);
+  return new Intl.NumberFormat('de-DE', {
+    style: 'currency',
+    currency: 'EUR',
+    maximumFractionDigits: 0,
+  }).format(value || 0);
 }
 
 function percent(value) {
@@ -96,11 +144,18 @@ function numberValueFromElement(element) {
 }
 
 function modernizationPoints() {
-  return MODERNIZATION_ELEMENTS.reduce((sum, item) => sum + (Number(modernization[item.id]) || 0), 0);
+  return MODERNIZATION_ELEMENTS.reduce(
+    (sum, item) => sum + (Number(modernization[item.id]) || 0),
+    0,
+  );
 }
 
 function buildingAge(data) {
-  return Math.max(0, getYearFromDate(data.valuationDate) - (Number(data.constructionYear) || getYearFromDate(data.valuationDate)));
+  return Math.max(
+    0,
+    getYearFromDate(data.valuationDate) -
+      (Number(data.constructionYear) || getYearFromDate(data.valuationDate)),
+  );
 }
 
 function calculateModifiedRND(data) {
@@ -131,7 +186,10 @@ function calculateBrwTimeFactor(currentBrw, valuationYear) {
     .forEach((point) => map.set(point.year, point.value));
 
   if (!currentBrw || map.size === 0) {
-    return { factor: 1, info: 'BRW-Zeitfaktor: keine auswertbare Historie angegeben, daher Faktor 1,00.' };
+    return {
+      factor: 1,
+      info: 'BRW-Zeitfaktor: keine auswertbare Historie angegeben, daher Faktor 1,00.',
+    };
   }
 
   const points = [
@@ -242,7 +300,9 @@ function getWgfzState() {
       targetCoefficient: null,
       wgfzFactor: 1,
       totalFactor: manualFactor,
-      warnings: ['Keine WGFZ-Korrektur möglich: Grundstücksfläche und wertrelevante Geschossfläche müssen eingegeben werden. Keine stille Ersatzrechnung mit Wohnfläche.'],
+      warnings: [
+        'Keine WGFZ-Korrektur möglich: Grundstücksfläche und wertrelevante Geschossfläche müssen eingegeben werden. Keine stille Ersatzrechnung mit Wohnfläche.',
+      ],
       explanation: 'Keine WGFZ-Korrektur möglich.',
     };
   }
@@ -293,12 +353,19 @@ function syncWgfzFactor() {
   setValue('landFeatureFactor', totalFactor.toFixed(3));
   setValue('wgfzIst', state.targetWgfz ? state.targetWgfz.toFixed(3) : '');
   setValue('wgfzCorrectionFactor', wgfzFactor.toFixed(3));
-  setValue('wgfzReferenceCoeff', state.referenceCoefficient != null ? Number(state.referenceCoefficient).toFixed(3) : '');
-  setValue('wgfzTargetCoeff', state.targetCoefficient != null ? Number(state.targetCoefficient).toFixed(3) : '');
+  setValue(
+    'wgfzReferenceCoeff',
+    state.referenceCoefficient != null ? Number(state.referenceCoefficient).toFixed(3) : '',
+  );
+  setValue(
+    'wgfzTargetCoeff',
+    state.targetCoefficient != null ? Number(state.targetCoefficient).toFixed(3) : '',
+  );
 
   const info = document.getElementById('wgfzInfo');
   if (info) {
-    const modelLabel = state.model === 'lowrise' ? '1–2-geschossiger Wohnungsbau' : 'Geschosswohnungsbau';
+    const modelLabel =
+      state.model === 'lowrise' ? '1–2-geschossiger Wohnungsbau' : 'Geschosswohnungsbau';
     const warningText = state.warnings?.length ? ` Warnung: ${state.warnings.join(' ')}` : '';
     info.textContent = `WGFZ-Korrektur: ${modelLabel}; WGFZ_Richtwert ${state.referenceWgfz.toFixed(3)} → UK_ref ${state.referenceCoefficient != null ? Number(state.referenceCoefficient).toFixed(3) : '–'}; WGFZ_Objekt ${state.targetWgfz ? state.targetWgfz.toFixed(3) : '–'} → UK_obj ${state.targetCoefficient != null ? Number(state.targetCoefficient).toFixed(3) : '–'}; Faktor = ${wgfzFactor.toFixed(3)}; manueller Faktor ${state.manualFactor.toFixed(3)}; Gesamtfaktor ${totalFactor.toFixed(3)}.${warningText}`;
   }
@@ -356,7 +423,15 @@ function injectWgfzBlock() {
 
   label.parentNode.insertBefore(block, label.nextSibling);
 
-  ['wgfzActive', 'wgfzModel', 'wgfzSoll', 'manualLocationFactor', 'wgfzExtrapolate', 'plotArea', 'relevantFloorArea'].forEach((id) => {
+  [
+    'wgfzActive',
+    'wgfzModel',
+    'wgfzSoll',
+    'manualLocationFactor',
+    'wgfzExtrapolate',
+    'plotArea',
+    'relevantFloorArea',
+  ].forEach((id) => {
     document.getElementById(id)?.addEventListener('input', () => {
       syncWgfzFactor();
       update();
@@ -423,13 +498,17 @@ function readCase() {
 }
 
 function calculate(data) {
-  const actualWgfz = data.plotArea > 0 && data.relevantFloorArea > 0 ? data.relevantFloorArea / data.plotArea : data.wgfz?.targetWgfz || 0;
+  const actualWgfz =
+    data.plotArea > 0 && data.relevantFloorArea > 0
+      ? data.relevantFloorArea / data.plotArea
+      : data.wgfz?.targetWgfz || 0;
   const adjustedBrw = data.baseLandValuePerSqm * data.timeAdjustmentFactor * data.landFeatureFactor;
-  const landValue = adjustedBrw * data.buildingLandArea + adjustedBrw * data.gardenArea * data.gardenFactor;
+  const landValue =
+    adjustedBrw * data.buildingLandArea + adjustedBrw * data.gardenArea * data.gardenFactor;
   const grossIncome = data.units.reduce((sum, unit) => sum + unitAnnualIncome(unit), 0);
-  const operatingCosts = grossIncome * data.operatingCostRate / 100;
+  const operatingCosts = (grossIncome * data.operatingCostRate) / 100;
   const netIncome = grossIncome - operatingCosts;
-  const landInterest = landValue * data.propertyYield / 100;
+  const landInterest = (landValue * data.propertyYield) / 100;
   const buildingIncome = netIncome - landInterest;
   const multiplier = calculateCapitalizationFactor(data.propertyYield, data.remainingLife);
   const buildingValue = buildingIncome * multiplier;
@@ -441,8 +520,8 @@ function calculate(data) {
   const totalAcquisitionCost = data.purchasePrice * (1 + data.purchaseCostsRate / 100);
   const valueGap = incomeValue - totalAcquisitionCost;
   const rentMultiplier = grossIncome > 0 ? data.purchasePrice / grossIncome : 0;
-  const grossYield = data.purchasePrice > 0 ? grossIncome / data.purchasePrice * 100 : 0;
-  const netYield = data.purchasePrice > 0 ? netIncome / data.purchasePrice * 100 : 0;
+  const grossYield = data.purchasePrice > 0 ? (grossIncome / data.purchasePrice) * 100 : 0;
+  const netYield = data.purchasePrice > 0 ? (netIncome / data.purchasePrice) * 100 : 0;
 
   return {
     actualWgfz,
@@ -487,7 +566,12 @@ function updateModernizationDisplay() {
 function renderUnits() {
   const container = document.getElementById('unitsContainer');
   if (!container) return;
-  container.innerHTML = units.map((unit, index) => `<div class="unit-card"><div class="unit-head"><strong>${unit.name || `Einheit ${index + 1}`}</strong><button type="button" data-remove-unit="${index}" ${units.length === 1 ? 'disabled' : ''}>Entfernen</button></div><div class="grid three compact-grid"><label>Name<input data-unit-field="name" data-unit-index="${index}" value="${unit.name || ''}" /></label><label>Fläche<input type="number" data-unit-field="area" data-unit-index="${index}" value="${unit.area || 0}" min="0" step="1" /><small>m²</small></label><label>Mietmodus<select data-unit-field="rentMode" data-unit-index="${index}"><option value="sqm" ${unit.rentMode === 'sqm' ? 'selected' : ''}>€/m²</option><option value="monthly" ${unit.rentMode === 'monthly' ? 'selected' : ''}>Monatsmiete</option></select></label><label>Miete €/m²<input type="number" data-unit-field="rentPerSqm" data-unit-index="${index}" value="${unit.rentPerSqm || 0}" min="0" step="0.1" /></label><label>Monatsmiete<input type="number" data-unit-field="monthlyRent" data-unit-index="${index}" value="${unit.monthlyRent || 0}" min="0" step="10" /></label><label>Faktor<input type="number" data-unit-field="factor" data-unit-index="${index}" value="${unit.factor || 1}" min="0" step="0.1" /></label></div><small data-unit-income="${index}">Jahresrohertrag: ${euro(unitAnnualIncome(unit))}</small></div>`).join('');
+  container.innerHTML = units
+    .map(
+      (unit, index) =>
+        `<div class="unit-card"><div class="unit-head"><strong>${unit.name || `Einheit ${index + 1}`}</strong><button type="button" data-remove-unit="${index}" ${units.length === 1 ? 'disabled' : ''}>Entfernen</button></div><div class="grid three compact-grid"><label>Name<input data-unit-field="name" data-unit-index="${index}" value="${unit.name || ''}" /></label><label>Fläche<input type="number" data-unit-field="area" data-unit-index="${index}" value="${unit.area || 0}" min="0" step="1" /><small>m²</small></label><label>Mietmodus<select data-unit-field="rentMode" data-unit-index="${index}"><option value="sqm" ${unit.rentMode === 'sqm' ? 'selected' : ''}>€/m²</option><option value="monthly" ${unit.rentMode === 'monthly' ? 'selected' : ''}>Monatsmiete</option></select></label><label>Miete €/m²<input type="number" data-unit-field="rentPerSqm" data-unit-index="${index}" value="${unit.rentPerSqm || 0}" min="0" step="0.1" /></label><label>Monatsmiete<input type="number" data-unit-field="monthlyRent" data-unit-index="${index}" value="${unit.monthlyRent || 0}" min="0" step="10" /></label><label>Faktor<input type="number" data-unit-field="factor" data-unit-index="${index}" value="${unit.factor || 1}" min="0" step="0.1" /></label></div><small data-unit-income="${index}">Jahresrohertrag: ${euro(unitAnnualIncome(unit))}</small></div>`,
+    )
+    .join('');
 }
 
 function updateUnitIncome(index) {
@@ -498,7 +582,12 @@ function updateUnitIncome(index) {
 function renderBrwHistory() {
   const container = document.getElementById('brwHistoryContainer');
   if (!container) return;
-  container.innerHTML = brwHistory.map((point, index) => `<div class="history-row"><label>Jahr<input type="number" data-history-field="year" data-history-index="${index}" value="${point.year || ''}" min="1900" max="2100" step="1" /></label><label>BRW<input type="number" data-history-field="value" data-history-index="${index}" value="${point.value || ''}" min="0" step="10" /></label><button type="button" data-remove-history="${index}">Entfernen</button></div>`).join('');
+  container.innerHTML = brwHistory
+    .map(
+      (point, index) =>
+        `<div class="history-row"><label>Jahr<input type="number" data-history-field="year" data-history-index="${index}" value="${point.year || ''}" min="1900" max="2100" step="1" /></label><label>BRW<input type="number" data-history-field="value" data-history-index="${index}" value="${point.value || ''}" min="0" step="10" /></label><button type="button" data-remove-history="${index}">Entfernen</button></div>`,
+    )
+    .join('');
 }
 
 function update() {
@@ -516,7 +605,22 @@ function update() {
   setText('bogSummary', euro(result.bogTotal));
   setText('purchaseSummary', `Ziel ${euro(result.targetOffer)}`);
 
-  ['adjustedBrw', 'landValue', 'grossIncome', 'operatingCosts', 'netIncome', 'landInterest', 'buildingIncome', 'buildingValue', 'preliminaryIncomeValue', 'bogTotal', 'incomeValue', 'targetOffer', 'totalAcquisitionCost', 'valueGap'].forEach((id) => {
+  [
+    'adjustedBrw',
+    'landValue',
+    'grossIncome',
+    'operatingCosts',
+    'netIncome',
+    'landInterest',
+    'buildingIncome',
+    'buildingValue',
+    'preliminaryIncomeValue',
+    'bogTotal',
+    'incomeValue',
+    'targetOffer',
+    'totalAcquisitionCost',
+    'valueGap',
+  ].forEach((id) => {
     setText(id, id === 'adjustedBrw' ? `${euro(result[id])} / m²` : euro(result[id]));
   });
 
@@ -527,11 +631,14 @@ function update() {
 
   let verdict = 'Neutral. Die Parameter prüfen und mit Marktbericht/Gutachten abgleichen.';
   if (result.buildingIncome < 0) {
-    verdict = 'Warnung: Bodenwertverzinsung liegt über dem Reinertrag. Ertragswertverfahren kritisch prüfen.';
+    verdict =
+      'Warnung: Bodenwertverzinsung liegt über dem Reinertrag. Ertragswertverfahren kritisch prüfen.';
   } else if (result.valueGap < -100000) {
-    verdict = 'Kaufpreis inkl. Nebenkosten liegt deutlich über dem Ertragswert. Nur mit Abschlag oder Zusatzpotenzial interessant.';
+    verdict =
+      'Kaufpreis inkl. Nebenkosten liegt deutlich über dem Ertragswert. Nur mit Abschlag oder Zusatzpotenzial interessant.';
   } else if (result.valueGap > 100000) {
-    verdict = 'Ertragswert liegt deutlich über Kaufpreis inkl. Nebenkosten. Wirtschaftlich interessant, Risiken prüfen.';
+    verdict =
+      'Ertragswert liegt deutlich über Kaufpreis inkl. Nebenkosten. Wirtschaftlich interessant, Risiken prüfen.';
   }
   setText('verdict', verdict);
 
@@ -544,13 +651,16 @@ function buildSummary(data, result) {
 
 function loadCase(data) {
   const merged = { ...DEFAULT_CASE, ...data };
-  if (!merged.valuationDate || merged.valuationDate === '2024-01-08') merged.valuationDate = todayIsoDate();
+  if (!merged.valuationDate || merged.valuationDate === '2024-01-08')
+    merged.valuationDate = todayIsoDate();
 
   Object.entries(merged).forEach(([key, value]) => {
     if (!['units', 'brwHistory', 'modernization'].includes(key)) setValue(key, value);
   });
 
-  units = merged.units?.length ? merged.units : [{ name: 'Einheit 1', area: 0, rentMode: 'sqm', rentPerSqm: 0, monthlyRent: 0, factor: 1 }];
+  units = merged.units?.length
+    ? merged.units
+    : [{ name: 'Einheit 1', area: 0, rentMode: 'sqm', rentPerSqm: 0, monthlyRent: 0, factor: 1 }];
   brwHistory = merged.brwHistory || [];
   modernization = { ...DEFAULT_MODERNIZATION, ...(merged.modernization || {}) };
 
@@ -578,10 +688,12 @@ document.addEventListener('input', (event) => {
   const modernizationId = target.dataset.modernizationId;
 
   if (unitField !== undefined) {
-    units[unitIndex][unitField] = target.type === 'number' ? numberValueFromElement(target) : target.value;
+    units[unitIndex][unitField] =
+      target.type === 'number' ? numberValueFromElement(target) : target.value;
     updateUnitIncome(unitIndex);
   }
-  if (historyField !== undefined) brwHistory[historyIndex][historyField] = numberValueFromElement(target);
+  if (historyField !== undefined)
+    brwHistory[historyIndex][historyField] = numberValueFromElement(target);
   if (modernizationId !== undefined) {
     modernization[modernizationId] = numberValueFromElement(target);
     updateModernizationDisplay();
@@ -625,7 +737,14 @@ document.addEventListener('click', (event) => {
 });
 
 document.getElementById('addUnit')?.addEventListener('click', () => {
-  units.push({ name: `Einheit ${units.length + 1}`, area: 0, rentMode: 'sqm', rentPerSqm: 0, monthlyRent: 0, factor: 1 });
+  units.push({
+    name: `Einheit ${units.length + 1}`,
+    area: 0,
+    rentMode: 'sqm',
+    rentPerSqm: 0,
+    monthlyRent: 0,
+    factor: 1,
+  });
   renderUnits();
   update();
 });
@@ -637,12 +756,18 @@ document.getElementById('addBrwHistory')?.addEventListener('click', () => {
   update();
 });
 
-document.getElementById('saveCase')?.addEventListener('click', () => localStorage.setItem('immowert-case', JSON.stringify(readCase())));
+document
+  .getElementById('saveCase')
+  ?.addEventListener('click', () =>
+    localStorage.setItem('immowert-case', JSON.stringify(readCase())),
+  );
 
 document.getElementById('resetCase')?.addEventListener('click', () => {
   localStorage.removeItem('immowert-case');
   brwHistory = [];
-  units = [{ name: 'Einheit 1', area: 0, rentMode: 'sqm', rentPerSqm: 0, monthlyRent: 0, factor: 1 }];
+  units = [
+    { name: 'Einheit 1', area: 0, rentMode: 'sqm', rentPerSqm: 0, monthlyRent: 0, factor: 1 },
+  ];
   modernization = { ...DEFAULT_MODERNIZATION };
   loadCase({ ...DEFAULT_CASE, valuationDate: todayIsoDate() });
 });
@@ -651,8 +776,18 @@ document.getElementById('copySummary')?.addEventListener('click', async () => {
   await navigator.clipboard.writeText(window.currentSummary || '');
 });
 
-document.getElementById('openBoris')?.addEventListener('click', () => openExternal(`https://www.google.com/search?q=${encodedAddress()}+BORIS-BW+Bodenrichtwert`));
-document.getElementById('openGeoportal')?.addEventListener('click', () => openExternal(`https://www.google.com/search?q=${encodedAddress()}+Geoportal+Stuttgart+Bodenrichtwert`));
+document
+  .getElementById('openBoris')
+  ?.addEventListener('click', () =>
+    openExternal(`https://www.google.com/search?q=${encodedAddress()}+BORIS-BW+Bodenrichtwert`),
+  );
+document
+  .getElementById('openGeoportal')
+  ?.addEventListener('click', () =>
+    openExternal(
+      `https://www.google.com/search?q=${encodedAddress()}+Geoportal+Stuttgart+Bodenrichtwert`,
+    ),
+  );
 
 const savedCase = localStorage.getItem('immowert-case');
 loadCase(savedCase ? JSON.parse(savedCase) : { ...DEFAULT_CASE, valuationDate: todayIsoDate() });
