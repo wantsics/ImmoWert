@@ -47,6 +47,47 @@ function assertPositive(name, value) {
   }
 }
 
+function syncWgfzControlsEnabledState() {
+  if (typeof document === 'undefined') return;
+
+  const activeInput = document.getElementById('wgfzActive');
+  if (!activeInput) return;
+
+  const active = activeInput.checked;
+  const inactiveControlIds = [
+    'wgfzModel',
+    'wgfzSoll',
+    'wgfzIst',
+    'wgfzReferenceCoeff',
+    'wgfzTargetCoeff',
+    'wgfzCorrectionFactor',
+    'wgfzExtrapolate',
+  ];
+
+  inactiveControlIds.forEach((id) => {
+    const element = document.getElementById(id);
+    if (element) element.disabled = !active;
+  });
+}
+
+function installWgfzControlsObserver() {
+  if (typeof document === 'undefined' || typeof MutationObserver === 'undefined') return;
+
+  document.addEventListener('change', (event) => {
+    if (event.target?.id === 'wgfzActive') syncWgfzControlsEnabledState();
+  });
+
+  document.addEventListener('input', (event) => {
+    if (event.target?.id === 'wgfzActive') syncWgfzControlsEnabledState();
+  });
+
+  const observer = new MutationObserver(() => syncWgfzControlsEnabledState());
+  observer.observe(document.documentElement, { childList: true, subtree: true });
+  window.setTimeout(syncWgfzControlsEnabledState, 0);
+}
+
+installWgfzControlsObserver();
+
 export function getWgfzTable(model) {
   const table = WGFZ_TABLES[model];
   if (!table) {
