@@ -236,7 +236,8 @@ function safeNumber(value, fallback = 0) {
 }
 
 function getWgfzState() {
-  const active = (document.getElementById('wgfzActive')?.value || '1') === '1';
+  const activeElement = document.getElementById('wgfzActive');
+  const active = activeElement ? activeElement.checked : true;
   const model = document.getElementById('wgfzModel')?.value || 'lowrise';
   const referenceWgfz = numberValue('wgfzSoll') || 1;
   const manualFactor = numberValue('manualLocationFactor') || 1;
@@ -392,7 +393,8 @@ function injectWgfzBlock() {
     </div>
     <div class="grid three compact-grid">
       <label>WGFZ-Korrektur aktiv
-        <select id="wgfzActive"><option value="1">ja</option><option value="0">nein</option></select>
+        <input type="checkbox" id="wgfzActive" checked>
+        <small>aus = nur manueller Faktor</small>
       </label>
       <label>Modell
         <select id="wgfzModel"><option value="lowrise">1–2-geschossiger Wohnungsbau</option><option value="multi">Geschosswohnungsbau</option></select>
