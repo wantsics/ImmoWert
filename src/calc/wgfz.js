@@ -47,6 +47,32 @@ function assertPositive(name, value) {
   }
 }
 
+function showFixedAppVersionBadge() {
+  if (typeof document === 'undefined') return;
+  if (document.getElementById('fixedAppVersionBadge')) return;
+
+  const badge = document.createElement('div');
+  badge.id = 'fixedAppVersionBadge';
+  badge.textContent = 'ImmoWert v0.2.0';
+  badge.setAttribute('aria-label', 'App-Version ImmoWert v0.2.0');
+  badge.style.cssText = [
+    'position:fixed',
+    'right:14px',
+    'bottom:10px',
+    'z-index:999999',
+    'padding:6px 10px',
+    'border-radius:999px',
+    'background:rgba(15,23,42,0.92)',
+    'color:#e0f2fe',
+    'font-size:12px',
+    'font-weight:800',
+    'letter-spacing:0.03em',
+    'box-shadow:0 8px 24px rgba(15,23,42,0.25)',
+    'pointer-events:none',
+  ].join(';');
+  document.body.appendChild(badge);
+}
+
 function syncWgfzControlsEnabledState() {
   if (typeof document === 'undefined') return;
 
@@ -86,6 +112,7 @@ function installWgfzControlsObserver() {
   window.setTimeout(syncWgfzControlsEnabledState, 0);
 }
 
+showFixedAppVersionBadge();
 installWgfzControlsObserver();
 
 export function getWgfzTable(model) {
