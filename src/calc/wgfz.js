@@ -2,6 +2,7 @@ import '../ui/workflow.js';
 import '../ui/brw-model.js';
 import '../ui/date-model.js';
 import '../ui/generic-land-model.js';
+import '../ui/object-area-model.js';
 
 export const WGFZ_MODELS = Object.freeze({
   LOWRISE: 'lowrise',
@@ -55,7 +56,7 @@ function assertPositive(name, value) {
 function setVisibleAppVersion() {
   if (typeof document === 'undefined') return;
 
-  const label = 'LAB7784 Immowert V0.2.9';
+  const label = 'LAB7784 Immowert V0.2.11';
   document.querySelectorAll('.ribbon-eyebrow, .hero .eyebrow').forEach((element) => {
     element.textContent = label;
   });
@@ -68,8 +69,8 @@ function showFixedAppVersionBadge() {
 
   const badge = document.createElement('div');
   badge.id = 'fixedAppVersionBadge';
-  badge.textContent = 'LAB7784 Immowert V0.2.9';
-  badge.setAttribute('aria-label', 'App-Version LAB7784 Immowert V0.2.9');
+  badge.textContent = 'LAB7784 Immowert V0.2.11';
+  badge.setAttribute('aria-label', 'App-Version LAB7784 Immowert V0.2.11');
   badge.style.cssText = [
     'position:fixed',
     'right:14px',
