@@ -1,4 +1,4 @@
-const VERSION = 'V0.2.10';
+const VERSION = 'V0.2.12';
 const APP_LABEL = `LAB7784 Immowert ${VERSION}`;
 
 let profiles = [];
@@ -157,18 +157,32 @@ function applyWgfzAvailability(profile) {
   const active = $('wgfzActive');
 
   if (active) {
-    active.checked = hasWgfz;
+    const previousProfileId = active.dataset.profileId || '';
+    const currentProfileId = profile?.id || '';
     active.disabled = !hasWgfz;
+
+    if (!hasWgfz) {
+      active.checked = false;
+    } else if (previousProfileId !== currentProfileId) {
+      active.checked = true;
+    }
+
+    active.dataset.profileId = currentProfileId;
   }
 
+  const enabledByUser = hasWgfz && !!active?.checked;
   ['wgfzModel', 'wgfzSoll', 'wgfzIst', 'wgfzReferenceCoeff', 'wgfzTargetCoeff', 'wgfzCorrectionFactor', 'wgfzExtrapolate'].forEach(
-    (id) => setDisabled(id, !hasWgfz, hasWgfz ? '' : 'Im aktiven Marktprofil keine WGFZ-Korrektur definiert.'),
+    (id) => setDisabled(id, !enabledByUser, hasWgfz ? 'WGFZ-Korrektur ist manuell deaktiviert.' : 'Im aktiven Marktprofil keine WGFZ-Korrektur definiert.'),
   );
 
-  if (!hasWgfz) {
+  if (!enabledByUser) {
     setValue('wgfzCorrectionFactor', '1.000');
     const info = $('wgfzInfo');
-    if (info) info.textContent = 'WGFZ-Korrektur: im aktiven Marktprofil nicht definiert. Faktor 1,000.';
+    if (info) {
+      info.textContent = hasWgfz
+        ? 'WGFZ-Korrektur manuell deaktiviert. Faktor 1,000.'
+        : 'WGFZ-Korrektur: im aktiven Marktprofil nicht definiert. Faktor 1,000.';
+    }
   }
 }
 
@@ -243,7 +257,7 @@ function applyGenericLandValue() {
 
   const automaticBrw = numValue('automaticBrwPerSqm') || numValue('baseLandValuePerSqm') * (numValue('timeAdjustmentFactor') || 1);
   const manualFactor = numValue('manualLocationFactor') || 1;
-  const wgfzActive = $('wgfzActive')?.checked;
+  const wgfzActive = $('wgfzActive')?.checked && !$('wgfzActive')?.disabled;
   const wgfzFactor = wgfzActive ? numValue('wgfzCorrectionFactor') || 1 : 1;
   const correctionFactor = manualFactor * wgfzFactor * referenceFactor;
   const weightedArea = numValue('buildingLandArea') + numValue('gardenArea') * (numValue('gardenFactor') || 0);
