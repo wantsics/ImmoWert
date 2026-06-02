@@ -1,3 +1,5 @@
+import '../ui/workflow.js';
+
 export const WGFZ_MODELS = Object.freeze({
   LOWRISE: 'lowrise',
   MULTI: 'multi',
@@ -50,7 +52,7 @@ function assertPositive(name, value) {
 function setVisibleAppVersion() {
   if (typeof document === 'undefined') return;
 
-  const label = 'LAB7784 Immowert V0.2.0';
+  const label = 'LAB7784 Immowert V0.2.1';
   document.querySelectorAll('.ribbon-eyebrow, .hero .eyebrow').forEach((element) => {
     element.textContent = label;
   });
@@ -63,8 +65,8 @@ function showFixedAppVersionBadge() {
 
   const badge = document.createElement('div');
   badge.id = 'fixedAppVersionBadge';
-  badge.textContent = 'LAB7784 Immowert V0.2.0';
-  badge.setAttribute('aria-label', 'App-Version LAB7784 Immowert V0.2.0');
+  badge.textContent = 'LAB7784 Immowert V0.2.1';
+  badge.setAttribute('aria-label', 'App-Version LAB7784 Immowert V0.2.1');
   badge.style.cssText = [
     'position:fixed',
     'right:14px',
