@@ -1,4 +1,4 @@
-const VERSION = 'V0.2.3';
+const VERSION = 'V0.2.4';
 const APP_LABEL = `LAB7784 Immowert ${VERSION}`;
 
 function $(id) {
@@ -122,6 +122,15 @@ function ensureStyles() {
       padding: 10px 12px;
       font-size: 15px;
     }
+    .workflow-ui input[type='checkbox'] {
+      width: 18px;
+      min-width: 18px;
+      height: 18px;
+      min-height: 18px;
+      padding: 0;
+      margin: 0;
+      accent-color: #0ea5e9;
+    }
     .workflow-ui small {
       line-height: 1.3;
       color: #64748b;
@@ -185,66 +194,6 @@ function ensureStyles() {
       font-size: 13px;
       line-height: 1.45;
     }
-    .workflow-ui .switch-label {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      align-items: center;
-      column-gap: 12px;
-      row-gap: 4px;
-      min-height: 68px;
-    }
-    .workflow-ui .switch-label .field-title {
-      grid-column: 1;
-      grid-row: 1;
-    }
-    .workflow-ui .switch-label small {
-      grid-column: 1 / -1;
-      grid-row: 2;
-    }
-    .workflow-ui .switch-label input[type='checkbox'] {
-      grid-column: 2;
-      grid-row: 1;
-      position: relative;
-      width: 46px;
-      min-width: 46px;
-      height: 26px;
-      min-height: 26px;
-      padding: 0;
-      margin: 0;
-      border: 0;
-      border-radius: 999px;
-      background: #cbd5e1;
-      appearance: none;
-      cursor: pointer;
-      transition: background 0.16s ease;
-      box-shadow: inset 0 0 0 1px rgba(15,23,42,0.08);
-    }
-    .workflow-ui .switch-label input[type='checkbox']::before {
-      content: '';
-      position: absolute;
-      width: 22px;
-      height: 22px;
-      top: 2px;
-      left: 2px;
-      border-radius: 999px;
-      background: white;
-      box-shadow: 0 2px 8px rgba(15,23,42,0.22);
-      transition: transform 0.16s ease;
-    }
-    .workflow-ui .switch-label input[type='checkbox']:checked {
-      background: #0ea5e9;
-    }
-    .workflow-ui .switch-label input[type='checkbox']:checked::before {
-      transform: translateX(20px);
-    }
-    .workflow-ui .switch-label input[type='checkbox']:focus-visible {
-      outline: none;
-      box-shadow: 0 0 0 4px rgba(14,165,233,0.18), inset 0 0 0 1px rgba(15,23,42,0.08);
-    }
-    .workflow-ui .switch-label input[type='checkbox']:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-    }
     .info-tooltip {
       width: 17px;
       height: 17px;
@@ -302,23 +251,13 @@ function normalizeLabelTitles(root = document) {
   });
 }
 
-function decorateSwitchControls(root = document) {
-  root.querySelectorAll("label input[type='checkbox']").forEach((input) => {
-    input.closest('label')?.classList.add('switch-label');
-  });
-}
-
 function installLabelNormalizer() {
   if (window.__workflowLabelNormalizerInstalled) return;
   window.__workflowLabelNormalizerInstalled = true;
 
-  const observer = new MutationObserver(() => {
-    normalizeLabelTitles(document);
-    decorateSwitchControls(document);
-  });
+  const observer = new MutationObserver(() => normalizeLabelTitles(document));
   observer.observe(document.documentElement, { childList: true, subtree: true });
   normalizeLabelTitles(document);
-  decorateSwitchControls(document);
 }
 
 function createSection(id, title, summaryText = '–') {
@@ -555,7 +494,6 @@ function buildWorkflow() {
   ensureStyles();
   setVersionLabel();
   normalizeLabelTitles(form);
-  decorateSwitchControls(form);
 
   const objectSection = $('objectName')?.closest('details.section');
   const landSection = $('baseLandValuePerSqm')?.closest('details.section') || $('plotArea')?.closest('details.section');
