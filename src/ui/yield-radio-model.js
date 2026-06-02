@@ -1,4 +1,4 @@
-const VERSION = 'V0.2.14';
+const VERSION = 'V0.2.15';
 const APP_LABEL = `LAB7784 Immowert ${VERSION}`;
 
 let installed = false;
@@ -66,8 +66,8 @@ function ensureStyle() {
       grid-template-columns: minmax(0, 1fr) auto auto;
       align-items: center;
       gap: 12px;
-      min-height: 36px;
-      padding: 7px 10px;
+      min-height: 34px;
+      padding: 6px 10px;
       border: 1px solid #e2e8f0;
       border-radius: 10px;
       background: #fff;
@@ -116,10 +116,15 @@ function ensureStyle() {
 
 function ensureYieldRadioBlock() {
   const select = $('yieldSourceSelect');
-  if (!select) return null;
+  const propertyYield = $('propertyYield');
+  if (!select || !propertyYield) return null;
 
   const selectLabel = select.closest('label');
   if (selectLabel) selectLabel.id = 'yieldSourceSelectLabel';
+
+  const propertyYieldLabel = propertyYield.closest('label');
+  const modelBody = propertyYield.closest('.section-body') || propertyYieldLabel?.parentNode;
+  if (!modelBody) return null;
 
   let block = $('yieldRadioBlock');
   if (!block) {
@@ -128,11 +133,17 @@ function ensureYieldRadioBlock() {
     block.className = 'yield-radio-block';
     block.innerHTML = `
       <div class="yield-radio-title">
-        <span>Liegenschaftszinssatz</span>
-        <small>aus aktivem Marktprofil</small>
+        <span>Liegenschaftszinssatz aus Marktprofil</span>
+        <small>eine Zeile pro Modellansatz</small>
       </div>
       <div id="yieldRadioList" class="yield-radio-list"></div>`;
-    selectLabel?.parentNode?.insertBefore(block, selectLabel.nextSibling);
+  }
+
+  const insertAfter = propertyYieldLabel?.nextSibling || modelBody.firstChild;
+  if (block.parentNode !== modelBody) {
+    modelBody.insertBefore(block, insertAfter);
+  } else if (propertyYieldLabel && block.previousElementSibling !== propertyYieldLabel) {
+    modelBody.insertBefore(block, propertyYieldLabel.nextSibling);
   }
 
   return block;
