@@ -1,4 +1,4 @@
-const VERSION = 'V0.2.5';
+const VERSION = 'V0.2.6';
 const APP_LABEL = `LAB7784 Immowert ${VERSION}`;
 
 function $(id) {
@@ -319,10 +319,26 @@ function ensureCurrentBrwYearField(target) {
   if (!target || $('currentBrwYear')) return;
 
   const label = document.createElement('label');
-  label.innerHTML = `BRW-Jahr aktuell
+  label.innerHTML = `BRW-Jahr
     <input type="number" id="currentBrwYear" min="1900" max="2100" step="1" value="${getValuationYear() - 1}">
-    <small>Jahr des aktuellen BRW aus BORIS/Marktbericht</small>`;
+    <small>Jahr des BRW aus BORIS/Marktbericht</small>`;
   target.appendChild(label);
+}
+
+function setCurrentBrwFieldLabel() {
+  const label = labelFor('baseLandValuePerSqm');
+  if (!label) return;
+
+  const title = label.querySelector('.field-title');
+  if (title) {
+    Array.from(title.childNodes).forEach((node) => {
+      if (node.nodeType === Node.TEXT_NODE) node.remove();
+    });
+    title.insertBefore(document.createTextNode('BRW '), title.firstChild);
+  }
+
+  const small = label.querySelector('small');
+  if (small) small.textContent = '€/m², aus BORIS/Marktbericht';
 }
 
 function ensureReferenceFields(target) {
@@ -378,14 +394,14 @@ function calculateCurrentBrwTimeFactor(currentBrw, valuationYear) {
   if (!currentBrw) {
     return {
       factor: 1,
-      info: 'BRW-Zeitfaktor: aktueller BRW fehlt. Erst aktuelles BRW-Jahr und aktuellen BRW erfassen.',
+      info: 'BRW-Zeitfaktor: Es wird mindestens ein BRW benötigt: Jahr + BRW erfassen.',
     };
   }
 
   if (!rows.length) {
     return {
       factor: 1,
-      info: `BRW-Zeitfaktor: aktueller BRW ${currentYear} = ${money(currentBrw)}/m². Keine Historie erfasst, daher keine Fortschreibung; Zeitfaktor 1,000.`,
+      info: `BRW-Zeitfaktor: BRW ${currentYear} = ${money(currentBrw)}/m². Kein historischer BRW erfasst; keine Fortschreibung, Zeitfaktor 1,000.`,
     };
   }
 
@@ -397,7 +413,7 @@ function calculateCurrentBrwTimeFactor(currentBrw, valuationYear) {
   if (span <= 0) {
     return {
       factor: 1,
-      info: `BRW-Zeitfaktor: Historie liegt nicht vor dem aktuellen BRW-Jahr ${currentYear}. Keine Fortschreibung; Zeitfaktor 1,000.`,
+      info: `BRW-Zeitfaktor: Historie liegt nicht vor dem BRW-Jahr ${currentYear}. Keine Fortschreibung; Zeitfaktor 1,000.`,
     };
   }
 
@@ -407,7 +423,7 @@ function calculateCurrentBrwTimeFactor(currentBrw, valuationYear) {
 
   return {
     factor,
-    info: `BRW-Zeitfaktor: aktueller BRW ${currentYear} = ${money(currentBrw)}/m². Trend aus ${first.year} (${money(first.value)}/m²) bis ${currentYear}: ${money(trend)}/m²·a. Bewertungsjahr ${valuationYear}: ${money(target)}/m². Zeitfaktor ${numberText(factor, 3)}.`,
+    info: `BRW-Zeitfaktor: BRW ${currentYear} = ${money(currentBrw)}/m². Historie ${first.year} = ${money(first.value)}/m². Linearer Trend ${money(trend)}/m²·a. Bewertungsjahr ${valuationYear}: ${money(target)}/m². Zeitfaktor ${numberText(factor, 3)}.`,
   };
 }
 
@@ -416,6 +432,7 @@ function applyCurrentBrwInputModel() {
   if (brw) brw.readOnly = false;
 
   $('brwDerivedHint')?.remove();
+  setCurrentBrwFieldLabel();
 
   const valuationYear = getValuationYear();
   const currentYearInput = $('currentBrwYear');
@@ -495,6 +512,7 @@ function placeBrwSection(form, landSection) {
 
   ensureCurrentBrwYearField(body);
   moveLabel('baseLandValuePerSqm', body);
+  setCurrentBrwFieldLabel();
   moveLabel('wgfzSoll', body);
   ensureReferenceFields(body);
 
