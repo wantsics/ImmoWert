@@ -1,4 +1,4 @@
-const VERSION = 'V0.2.9';
+const VERSION = 'V0.2.10';
 const APP_LABEL = `LAB7784 Immowert ${VERSION}`;
 
 let profiles = [];
@@ -219,6 +219,22 @@ function capitalizationFactor(yieldPercent, years) {
   return (qn - 1) / (qn * p);
 }
 
+function renderCorrectionModelInfo(profile) {
+  const profileInfo = $('marketProfileInfo');
+  if (!profileInfo || !profile) return;
+
+  const activeCorrections = correctionList(profile)
+    .map((item) => item.label || item.id || item.type)
+    .join(' · ');
+  const line = `Korrekturmodell: ${activeCorrections || 'nur Standardfaktoren 1,000'}`;
+  const marker = '<br>Korrekturmodell:';
+  const baseHtml = profileInfo.innerHTML.includes(marker)
+    ? profileInfo.innerHTML.slice(0, profileInfo.innerHTML.indexOf(marker))
+    : profileInfo.innerHTML;
+
+  profileInfo.innerHTML = `${baseHtml}<br>${line}`;
+}
+
 function applyGenericLandValue() {
   const profile = activeProfile();
   setVersionLabel();
@@ -280,13 +296,7 @@ function applyGenericLandValue() {
   const factorsSummary = $('workflowFactorsSubsection')?.querySelector('[data-workflow-summary]');
   if (factorsSummary) factorsSummary.textContent = `Faktor ${numberText(correctionFactor, 3)} · manuell ${numberText(manualFactor, 3)} · WGFZ ${numberText(wgfzFactor, 3)} · Ref ${numberText(referenceFactor, 3)}`;
 
-  const profileInfo = $('marketProfileInfo');
-  if (profileInfo && profile) {
-    const activeCorrections = correctionList(profile)
-      .map((item) => item.label || item.id || item.type)
-      .join(' · ');
-    profileInfo.innerHTML += `<br>Korrekturmodell: ${activeCorrections || 'nur Standardfaktoren 1,000'}`;
-  }
+  renderCorrectionModelInfo(profile);
 }
 
 function wrapUpdate() {
