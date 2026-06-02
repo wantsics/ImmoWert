@@ -1,4 +1,4 @@
-const VERSION = 'V0.2.15';
+const VERSION = 'V0.2.16';
 const APP_LABEL = `LAB7784 Immowert ${VERSION}`;
 
 let installed = false;
@@ -40,6 +40,9 @@ function ensureStyle() {
   const style = document.createElement('style');
   style.id = 'yieldRadioModelCss';
   style.textContent = `
+    .workflow-ui .yield-box {
+      display: none !important;
+    }
     .workflow-ui .yield-radio-block {
       grid-column: 1 / -1;
       border: 1px solid #dbeafe;
