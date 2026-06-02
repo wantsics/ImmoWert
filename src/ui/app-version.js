@@ -1,20 +1,41 @@
 export const APP_VERSION = 'V0.2.13';
 export const APP_LABEL = `LAB7784 Immowert ${APP_VERSION}`;
 
+let applying = false;
+
 function setVisibleAppVersion() {
-  if (typeof document === 'undefined') return;
+  if (typeof document === 'undefined' || applying) return;
+  applying = true;
 
   document.querySelectorAll('.ribbon-eyebrow, .hero .eyebrow').forEach((element) => {
-    element.textContent = APP_LABEL;
+    if (element.textContent !== APP_LABEL) element.textContent = APP_LABEL;
   });
 
   const badge = document.getElementById('fixedAppVersionBadge');
   if (badge) {
-    badge.textContent = APP_LABEL;
+    if (badge.textContent !== APP_LABEL) badge.textContent = APP_LABEL;
     badge.setAttribute('aria-label', `App-Version ${APP_LABEL}`);
   }
 
-  document.title = `${APP_LABEL} – Analyse & Datenerhebung`;
+  const title = `${APP_LABEL} – Analyse & Datenerhebung`;
+  if (document.title !== title) document.title = title;
+
+  applying = false;
+}
+
+function installVersionObserver() {
+  if (typeof MutationObserver === 'undefined') return;
+  if (window.__immowertVersionObserverInstalled) return;
+  window.__immowertVersionObserverInstalled = true;
+
+  const observer = new MutationObserver(() => {
+    window.requestAnimationFrame(setVisibleAppVersion);
+  });
+  observer.observe(document.documentElement, {
+    childList: true,
+    subtree: true,
+    characterData: true,
+  });
 }
 
 function installVisibleAppVersion() {
@@ -25,12 +46,18 @@ function installVisibleAppVersion() {
   window.setImmowertAppVersion = setVisibleAppVersion;
 
   setVisibleAppVersion();
+  installVersionObserver();
 
-  document.addEventListener('DOMContentLoaded', setVisibleAppVersion);
-
-  [0, 50, 100, 300, 700, 1200, 1800, 2600, 4000, 6000].forEach((delay) => {
-    window.setTimeout(setVisibleAppVersion, delay);
+  document.addEventListener('DOMContentLoaded', () => {
+    setVisibleAppVersion();
+    installVersionObserver();
   });
+
+  [0, 25, 50, 100, 200, 300, 700, 1200, 1800, 2600, 4000, 6000, 8000].forEach(
+    (delay) => {
+      window.setTimeout(setVisibleAppVersion, delay);
+    },
+  );
 }
 
 installVisibleAppVersion();
