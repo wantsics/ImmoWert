@@ -5,6 +5,7 @@ import '../ui/generic-land-model.js';
 import '../ui/object-area-model.js';
 import '../ui/yield-radio-model.js';
 import '../ui/mobile-layout.js';
+import '../ui/measurement-input-adapter.js';
 import '../ui/app-version.js';
 
 export const WGFZ_MODELS = Object.freeze({
