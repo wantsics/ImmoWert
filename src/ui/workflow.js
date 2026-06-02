@@ -1,4 +1,4 @@
-const VERSION = 'V0.2.4';
+const VERSION = 'V0.2.5';
 const APP_LABEL = `LAB7784 Immowert ${VERSION}`;
 
 function $(id) {
@@ -26,6 +26,17 @@ function numberText(value, digits = 3) {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
   });
+}
+
+function setValue(id, value) {
+  const element = $(id);
+  if (element) element.value = value ?? '';
+}
+
+function getValuationYear() {
+  const raw = $('valuationDate')?.value;
+  const date = raw ? new Date(`${raw}T12:00:00`) : new Date();
+  return Number.isFinite(date.getFullYear()) ? date.getFullYear() : new Date().getFullYear();
 }
 
 function setVersionLabel() {
@@ -194,6 +205,9 @@ function ensureStyles() {
       font-size: 13px;
       line-height: 1.45;
     }
+    .workflow-ui .brw-current-note {
+      margin-top: 0;
+    }
     .info-tooltip {
       width: 17px;
       height: 17px;
@@ -301,6 +315,16 @@ function insertBeforeFormSection(form, section, beforeSection) {
   else if (section.parentNode !== form) form.appendChild(section);
 }
 
+function ensureCurrentBrwYearField(target) {
+  if (!target || $('currentBrwYear')) return;
+
+  const label = document.createElement('label');
+  label.innerHTML = `BRW-Jahr aktuell
+    <input type="number" id="currentBrwYear" min="1900" max="2100" step="1" value="${getValuationYear() - 1}">
+    <small>Jahr des aktuellen BRW aus BORIS/Marktbericht</small>`;
+  target.appendChild(label);
+}
+
 function ensureReferenceFields(target) {
   if (!target || $('referencePlotSize')) return;
 
@@ -335,6 +359,88 @@ function ensureReferenceFactorBlock(target) {
       <label>Herleitung<input value="Im aktiven Marktprofil aktuell nicht berechnet" readonly><small>Tabellenwert/Formel wird später hier angezeigt</small></label>
     </div>`;
   target.appendChild(block);
+}
+
+function brwHistoryRows() {
+  return Array.from(document.querySelectorAll('#brwHistoryContainer .history-row'))
+    .map((row) => ({
+      year: Number(row.querySelector('[data-history-field="year"]')?.value) || 0,
+      value: Number(row.querySelector('[data-history-field="value"]')?.value) || 0,
+    }))
+    .filter((point) => point.year > 0 && point.value > 0)
+    .sort((a, b) => a.year - b.year);
+}
+
+function calculateCurrentBrwTimeFactor(currentBrw, valuationYear) {
+  const currentYear = numberValue('currentBrwYear') || valuationYear - 1;
+  const rows = brwHistoryRows().filter((point) => point.year !== currentYear);
+
+  if (!currentBrw) {
+    return {
+      factor: 1,
+      info: 'BRW-Zeitfaktor: aktueller BRW fehlt. Erst aktuelles BRW-Jahr und aktuellen BRW erfassen.',
+    };
+  }
+
+  if (!rows.length) {
+    return {
+      factor: 1,
+      info: `BRW-Zeitfaktor: aktueller BRW ${currentYear} = ${money(currentBrw)}/m². Keine Historie erfasst, daher keine Fortschreibung; Zeitfaktor 1,000.`,
+    };
+  }
+
+  const points = [...rows, { year: currentYear, value: currentBrw }].sort((a, b) => a.year - b.year);
+  const currentPoint = { year: currentYear, value: currentBrw };
+  const first = points[0];
+  const span = currentPoint.year - first.year;
+
+  if (span <= 0) {
+    return {
+      factor: 1,
+      info: `BRW-Zeitfaktor: Historie liegt nicht vor dem aktuellen BRW-Jahr ${currentYear}. Keine Fortschreibung; Zeitfaktor 1,000.`,
+    };
+  }
+
+  const trend = (currentPoint.value - first.value) / span;
+  const target = currentPoint.value + trend * (valuationYear - currentPoint.year);
+  const factor = target > 0 ? target / currentPoint.value : 1;
+
+  return {
+    factor,
+    info: `BRW-Zeitfaktor: aktueller BRW ${currentYear} = ${money(currentBrw)}/m². Trend aus ${first.year} (${money(first.value)}/m²) bis ${currentYear}: ${money(trend)}/m²·a. Bewertungsjahr ${valuationYear}: ${money(target)}/m². Zeitfaktor ${numberText(factor, 3)}.`,
+  };
+}
+
+function applyCurrentBrwInputModel() {
+  const brw = $('baseLandValuePerSqm');
+  if (brw) brw.readOnly = false;
+
+  $('brwDerivedHint')?.remove();
+
+  const valuationYear = getValuationYear();
+  const currentYearInput = $('currentBrwYear');
+  if (currentYearInput && !currentYearInput.value) currentYearInput.value = valuationYear - 1;
+
+  const factor = calculateCurrentBrwTimeFactor(numberValue('baseLandValuePerSqm'), valuationYear);
+  setValue('timeAdjustmentFactor', numberText(factor.factor, 3).replace(',', '.'));
+  const info = $('brwTrendInfo');
+  if (info) info.textContent = factor.info;
+
+  return factor;
+}
+
+function installCurrentBrwInputModel() {
+  if (typeof window === 'undefined') return;
+
+  window.calculateBrwTimeFactor = calculateCurrentBrwTimeFactor;
+  window.deriveBrwFromHistory = applyCurrentBrwInputModel;
+
+  ['baseLandValuePerSqm', 'currentBrwYear', 'valuationDate'].forEach((id) => {
+    $(id)?.addEventListener('input', applyCurrentBrwInputModel);
+    $(id)?.addEventListener('change', applyCurrentBrwInputModel);
+  });
+
+  applyCurrentBrwInputModel();
 }
 
 function placeMarketProfile(form, objectSection) {
@@ -387,6 +493,7 @@ function placeBrwSection(form, landSection) {
   const body = sectionBody(section);
   body.className = 'section-body grid two';
 
+  ensureCurrentBrwYearField(body);
   moveLabel('baseLandValuePerSqm', body);
   moveLabel('wgfzSoll', body);
   ensureReferenceFields(body);
@@ -454,11 +561,12 @@ function updateWorkflowSummaries() {
   setSectionSummary($('workflowUnitsSubsection'), `${units || 0} Einheiten · ${area ? `${numberText(area, 0)} m² Wfl.` : 'Wfl. offen'}`);
 
   const brw = numberValue('baseLandValuePerSqm');
+  const brwYear = numberValue('currentBrwYear');
   const wgfzSoll = numberValue('wgfzSoll');
   const reference = numberValue('referencePlotSize');
   setSectionSummary(
     $('workflowBrwSection'),
-    `BRW ${brw ? `${money(brw)}/m²` : 'offen'} · WGFZ ${wgfzSoll ? numberText(wgfzSoll, 2) : '–'} · Ref. ${reference ? `${numberText(reference, 0)} m²` : '–'}`,
+    `BRW ${brw ? `${money(brw)}/m²` : 'offen'} · Jahr ${brwYear || '–'} · WGFZ ${wgfzSoll ? numberText(wgfzSoll, 2) : '–'} · Ref. ${reference ? `${numberText(reference, 0)} m²` : '–'}`,
   );
 
   const timeFactor = numberValue('timeAdjustmentFactor') || 1;
@@ -503,6 +611,7 @@ function buildWorkflow() {
   placeObjectAndUnits(objectSection, incomeSection);
   placeBrwSection(form, landSection);
   placeLandValueSection(landSection);
+  installCurrentBrwInputModel();
   installLabelNormalizer();
   installWorkflowEvents();
   updateWorkflowSummaries();
