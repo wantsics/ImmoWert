@@ -1,8 +1,8 @@
 # ImmoWert
 
 **Branch:** `refactor/bodenwert-workflow`  
-**Stand:** `LAB7784 Immowert V0.2.16`  
-**Ziel:** wissenschaftlich nachvollziehbare, marktberichtnahe Immobilienbewertung mit transparenter Bodenwert-, Ertragswert- und Marktprofil-Logik.
+**Stand:** `LAB7784 Immowert V0.2.17`  
+**Ziel:** wissenschaftlich nachvollziehbare, marktberichtnahe Immobilienbewertung mit transparenter Bodenwert-, Ertragswert-, Marktprofil- und Mobile-Workflow-Logik.
 
 ---
 
@@ -516,7 +516,97 @@ Der alte statische Stuttgart-Block ist ausgeblendet, weil das Profilmodell gener
 
 ---
 
-## 11. JSON-Marktprofilstruktur
+## 11. Mobile Optimierung und GitHub Pages
+
+### 11.1 Ziel
+
+Seit `V0.2.17` ist die Anwendung für GitHub Pages und mobile Endgeräte optimiert. Ziel ist nicht eine vollständig eigenständige Mobile-App, sondern eine nutzbare mobile Erfassungs- und Prüfansicht:
+
+```text
+Objekt vor Ort öffnen → Daten erfassen → Plausibilität prüfen → Ergebnis grob lesen
+```
+
+Desktop bleibt weiterhin die primäre Arbeitsansicht für vollständige Analysen.
+
+### 11.2 Technisches Modul
+
+Die Mobile-Optimierung liegt in:
+
+```text
+src/ui/mobile-layout.js
+```
+
+Das Modul wird über den Import-Hub geladen:
+
+```text
+src/calc/wgfz.js
+```
+
+Die Umsetzung erfolgt bewusst überwiegend über CSS-Media-Queries und injiziertes Layout-CSS. Fachlogik und Rechenlogik werden nicht verändert.
+
+### 11.3 Breakpoints
+
+Aktuelle Breakpoints:
+
+```text
+max-width: 760px  → Mobile-Layout
+max-width: 420px  → sehr schmale Geräte
+```
+
+### 11.4 Layout-Regeln unter 760 px
+
+| Bereich | Mobile-Verhalten |
+|---|---|
+| Hauptlayout | einspaltig |
+| Ergebnisbereich | nach oben gezogen |
+| Grids `two` / `three` | einspaltig |
+| Header | kompakter, zweizeilig möglich |
+| Tabs | horizontal scrollbar |
+| Panels / Karten | weniger Padding, kleinere Radien |
+| Summary-Zeilen | umbrechen statt horizontal sprengen |
+| Buttons | volle Breite, touchfreundlich |
+| Inputs | Mindesthöhe ca. 44 px |
+| Zinssatz-Radios | kompakte antippbare Zeilen |
+| Tooltips | fixed Overlay statt kleiner Hover-Popup |
+| Versionsbadge | kleiner und weniger dominant |
+
+### 11.5 Mobile-Designprinzipien
+
+```text
+Kein horizontales Scrollen.
+Keine drei Eingabefelder nebeneinander.
+Ergebnis zuerst sichtbar.
+Touch-Ziele groß genug.
+Lange Summary- und Ergebniszeilen dürfen umbrechen.
+Desktop-Layout darf durch Mobile-CSS nicht verschlechtert werden.
+```
+
+### 11.6 Bekannte Einschränkungen Mobile
+
+- Sehr lange Feldbezeichnungen können weiterhin hohe Karten erzeugen.
+- Tooltips sind auf Touch-Geräten nur eingeschränkt ideal, weil das ursprüngliche UI auf Hover ausgelegt war.
+- Die Anwendung ist für schnelle Datenerfassung geeignet, aber nicht für komfortable vollständige Gutachtenbearbeitung auf kleinen Displays.
+- GitHub Pages kann alte JS/CSS-Dateien cachen; bei Tests kann ein Query-Parameter wie `?v=0217` helfen.
+
+### 11.7 Mobile-Regressionstest
+
+```text
+1. GitHub-Pages-URL auf Smartphone öffnen.
+2. Version muss V0.2.17 anzeigen.
+3. Kein horizontales Scrollen auf 360–430 px Breite.
+4. Header und Tabs bleiben bedienbar.
+5. Ergebnisblock steht mobil oberhalb der Eingaben.
+6. Marktprofilwechsel funktioniert.
+7. Objekt-/Flächenfelder sind einspaltig.
+8. BRW-Historie ist bedienbar.
+9. WGFZ-Checkbox funktioniert.
+10. Zinssatz-Radioliste ist sauber antippbar.
+11. Tooltips sprengen nicht die Viewportbreite.
+```
+
+---
+
+## 12. JSON-Marktprofilstruktur
 
 Datei:
 
@@ -524,7 +614,7 @@ Datei:
 market-profiles.json
 ```
 
-### 11.1 Top-Level
+### 12.1 Top-Level
 
 ```json
 {
@@ -539,7 +629,7 @@ market-profiles.json
 }
 ```
 
-### 11.2 Wichtige Felder
+### 12.2 Wichtige Felder
 
 | Feld | Bedeutung |
 |---|---|
@@ -558,7 +648,7 @@ market-profiles.json
 | `comparisonValue` | Vergleichswertfaktoren, soweit vorhanden |
 | `marketEvidence` | zusätzliche Marktdaten |
 
-### 11.3 `landValue`
+### 12.3 `landValue`
 
 ```json
 "landValue": {
@@ -586,7 +676,7 @@ Bedeutung:
 | `interpolation` | Interpolationsart |
 | `notes` | fachliche Hinweise |
 
-### 11.4 Empfohlene Zielstruktur `landValue.corrections`
+### 12.4 Empfohlene Zielstruktur `landValue.corrections`
 
 Für neue Profile soll die Korrekturlogik expliziter werden:
 
@@ -635,9 +725,9 @@ Keine Stadtlogik hardcodieren.
 
 ---
 
-## 12. Aktuelle Profile
+## 13. Aktuelle Profile
 
-### 12.1 Stuttgart 2024
+### 13.1 Stuttgart 2024
 
 - Modell: `wgfz`
 - WGFZ-Korrektur aktiv
@@ -651,7 +741,7 @@ Formel laut Profil:
 BRW_adj = BRW × Zeitfaktor × UK(WGFZ_ist) / UK(WGFZ_soll) × sonstiger Faktor
 ```
 
-### 12.2 Reutlingen 2025
+### 13.2 Reutlingen 2025
 
 - Modell: `reutlingen_no_wgfz_individual_housing`
 - WGFZ im individuellen Wohnungsbau deaktiviert
@@ -667,7 +757,7 @@ comparisonValue.efhZfhPlotSizeFactor wird als Referenzflächenkorrektur ausgewer
 
 Langfristig sollte das explizit nach `landValue.corrections` migriert werden.
 
-### 12.3 Fellbach 2022
+### 13.3 Fellbach 2022
 
 - Modell: `brw_manual_no_local_adjustment_tables`
 - keine lokalen WGFZ- oder Grundstücksgrößen-Umrechnungskoeffizienten
@@ -678,7 +768,7 @@ Langfristig sollte das explizit nach `landValue.corrections` migriert werden.
 
 ---
 
-## 13. Implementierungsübersicht
+## 14. Implementierungsübersicht
 
 | Datei | Aufgabe |
 |---|---|
@@ -694,6 +784,7 @@ Langfristig sollte das explizit nach `landValue.corrections` migriert werden.
 | `src/ui/generic-land-model.js` | profilbasierte Bodenwertkorrekturen |
 | `src/ui/object-area-model.js` | Grundstücks-/Flächenblock im Objekt |
 | `src/ui/yield-radio-model.js` | Liegenschaftszins-Radioliste aus Profil |
+| `src/ui/mobile-layout.js` | Mobile-/GitHub-Pages-Responsive-Layout |
 | `src/ui/app-version.js` | zentrale sichtbare Version |
 
 Aktuelle technische Realität:
@@ -702,6 +793,7 @@ Aktuelle technische Realität:
 app.js enthält ursprüngliche Rechenlogik.
 generic-land-model.js korrigiert profilabhängig Ergebniswerte.
 Mehrere UI-Module verschieben DOM-Elemente nachträglich.
+mobile-layout.js ergänzt nur Darstellungsregeln und verändert keine Fachlogik.
 ```
 
 Zielarchitektur:
@@ -712,7 +804,7 @@ Profilmodell → zentraler Rechenkern → Ergebnisobjekt → UI-Rendering
 
 ---
 
-## 14. Bekannte technische Schulden
+## 15. Bekannte technische Schulden
 
 1. **Doppelte Bodenwertlogik**  
    `app.js` und `generic-land-model.js` berechnen bzw. überschreiben Teile des Bodenwerts. Ziel ist eine zentrale `calculateLandValue()`-Funktion.
@@ -729,9 +821,12 @@ Profilmodell → zentraler Rechenkern → Ergebnisobjekt → UI-Rendering
 5. **Reutlingen Referenzfläche**  
    Der aktuell verwendete Faktor liegt unter `comparisonValue`; fachlich sauberer wäre eine explizite `landValue.corrections`-Definition.
 
+6. **Mobile als CSS-Overlay**  
+   `mobile-layout.js` korrigiert die mobile Darstellung über nachträglich injiziertes CSS. Langfristig sollte ein konsolidiertes responsives Basiscss in `style.css` entstehen.
+
 ---
 
-## 15. Regressionstests
+## 16. Regressionstests
 
 ### Stuttgart
 
@@ -794,15 +889,26 @@ Radiobutton setzt propertyYield und propertyYieldNote
 alter statischer Stuttgart-Zinsblock ist nicht sichtbar
 ```
 
+### Mobile
+
+```text
+GitHub Pages auf Smartphone öffnen
+kein horizontales Scrollen
+Tabs horizontal scrollbar und bedienbar
+Ergebnisblock mobil oben sichtbar
+Formfelder einspaltig
+Buttons und Radioliste antippbar
+```
+
 ### Version
 
 ```text
-sichtbare Version bleibt stabil auf LAB7784 Immowert V0.2.16
+sichtbare Version bleibt stabil auf LAB7784 Immowert V0.2.17
 ```
 
 ---
 
-## 16. Entwicklungsregeln für neue Agenten
+## 17. Entwicklungsregeln für neue Agenten
 
 1. Keine Stadtlogik hardcodieren.
 
@@ -842,11 +948,14 @@ Faktor = 1,000
 }
 ```
 
-5. Jede fachliche Änderung muss README und Testfälle aktualisieren.
+5. Mobile Änderungen dürfen keine Fachlogik verändern.  
+   Responsive-Anpassungen gehören in CSS oder ein klar gekennzeichnetes UI-Modul.
+
+6. Jede fachliche Änderung muss README und Testfälle aktualisieren.
 
 ---
 
-## 17. Lokale Entwicklung
+## 18. Lokale Entwicklung
 
 ```powershell
 git checkout refactor/bodenwert-workflow
@@ -862,3 +971,9 @@ npx serve .
 ```
 
 Wichtig: Marktprofile können im Browser-Local-Storage überschrieben sein. Bei unerwartetem Verhalten im Service-Menü `Defaults wiederherstellen` nutzen.
+
+Bei GitHub-Pages-Tests können Browser und CDN alte Dateien cachen. Für harte Tests kann ein URL-Parameter verwendet werden:
+
+```text
+https://<user>.github.io/<repo>/?v=0217
+```
