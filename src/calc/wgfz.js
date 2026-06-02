@@ -4,6 +4,7 @@ import '../ui/date-model.js';
 import '../ui/generic-land-model.js';
 import '../ui/object-area-model.js';
 import '../ui/yield-radio-model.js';
+import '../ui/mobile-loader.js';
 import '../ui/app-version.js';
 
 export const WGFZ_MODELS = Object.freeze({
