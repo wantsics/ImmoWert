@@ -47,14 +47,24 @@ function assertPositive(name, value) {
   }
 }
 
+function setVisibleAppVersion() {
+  if (typeof document === 'undefined') return;
+
+  const label = 'LAB7784 Immowert V0.2.0';
+  document.querySelectorAll('.ribbon-eyebrow, .hero .eyebrow').forEach((element) => {
+    element.textContent = label;
+  });
+  document.title = `${label} – Analyse & Datenerhebung`;
+}
+
 function showFixedAppVersionBadge() {
   if (typeof document === 'undefined') return;
   if (document.getElementById('fixedAppVersionBadge')) return;
 
   const badge = document.createElement('div');
   badge.id = 'fixedAppVersionBadge';
-  badge.textContent = 'ImmoWert v0.2.0';
-  badge.setAttribute('aria-label', 'App-Version ImmoWert v0.2.0');
+  badge.textContent = 'LAB7784 Immowert V0.2.0';
+  badge.setAttribute('aria-label', 'App-Version LAB7784 Immowert V0.2.0');
   badge.style.cssText = [
     'position:fixed',
     'right:14px',
@@ -71,6 +81,25 @@ function showFixedAppVersionBadge() {
     'pointer-events:none',
   ].join(';');
   document.body.appendChild(badge);
+}
+
+function installVisibleAppVersion() {
+  if (typeof document === 'undefined' || typeof window === 'undefined') return;
+
+  setVisibleAppVersion();
+  showFixedAppVersionBadge();
+
+  document.addEventListener('DOMContentLoaded', () => {
+    setVisibleAppVersion();
+    showFixedAppVersionBadge();
+  });
+
+  [0, 100, 500, 1500].forEach((delay) => {
+    window.setTimeout(() => {
+      setVisibleAppVersion();
+      showFixedAppVersionBadge();
+    }, delay);
+  });
 }
 
 function syncWgfzControlsEnabledState() {
@@ -112,7 +141,7 @@ function installWgfzControlsObserver() {
   window.setTimeout(syncWgfzControlsEnabledState, 0);
 }
 
-showFixedAppVersionBadge();
+installVisibleAppVersion();
 installWgfzControlsObserver();
 
 export function getWgfzTable(model) {
