@@ -1,4 +1,4 @@
-export const APP_VERSION = 'V0.2.16';
+export const APP_VERSION = 'V0.2.17';
 export const APP_LABEL = `LAB7784 Immowert ${APP_VERSION}`;
 
 let applying = false;
