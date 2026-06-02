@@ -1,4 +1,4 @@
-const VERSION = 'V0.2.1';
+const VERSION = 'V0.2.2';
 const APP_LABEL = `LAB7784 Immowert ${VERSION}`;
 
 function $(id) {
@@ -45,21 +45,37 @@ function ensureStyles() {
   const style = document.createElement('style');
   style.id = 'sourceWorkflowCss';
   style.textContent = `
+    .workflow-ui {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
     .workflow-ui .section {
-      margin-bottom: 16px;
+      margin-bottom: 0;
+      border: 1px solid #bae6fd;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.78);
+      padding: 0 16px 16px;
     }
     .workflow-ui .source-section > summary,
     .workflow-ui .source-subsection > summary {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
+      gap: 18px;
       padding: 14px 0;
       border-bottom: 1px solid #bae6fd;
+      margin: 0 0 14px;
     }
     .workflow-ui .source-section > summary span,
     .workflow-ui .source-subsection > summary span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
       font-weight: 800;
+      line-height: 1.25;
+      white-space: nowrap;
     }
     .workflow-ui .source-section > summary strong,
     .workflow-ui .source-subsection > summary strong {
@@ -67,20 +83,82 @@ function ensureStyles() {
       text-align: right;
       overflow-wrap: anywhere;
       font-size: 14px;
+      line-height: 1.35;
+      font-weight: 700;
     }
-    .source-subsection {
+    .workflow-ui .section-body {
+      padding-bottom: 0;
+    }
+    .workflow-ui .grid {
+      gap: 14px;
+    }
+    .workflow-ui label {
+      min-width: 0;
+      gap: 6px;
+      font-weight: 600;
+      line-height: 1.25;
+    }
+    .workflow-ui .field-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 22px;
+      color: #0f172a;
+      font-weight: 700;
+      line-height: 1.25;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .workflow-ui .field-title .info-tooltip,
+    .workflow-ui summary .info-tooltip,
+    .workflow-ui .section-title-inline .info-tooltip {
+      flex: 0 0 auto;
+      margin-left: 0;
+    }
+    .workflow-ui input,
+    .workflow-ui select {
+      min-height: 44px;
+      padding: 10px 12px;
+      font-size: 15px;
+    }
+    .workflow-ui small {
+      line-height: 1.3;
+      color: #64748b;
+    }
+    .workflow-ui .section-title-inline {
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .workflow-ui .section-title-inline strong {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      line-height: 1.25;
+    }
+    .workflow-ui .history-block,
+    .workflow-ui .unit-card,
+    .workflow-ui .market-profile-block,
+    .workflow-ui .bog-list-block,
+    .workflow-ui .rnd-method-selector {
+      background: #f8fafc;
+      border: 1px solid #dbeafe;
+      border-radius: 14px;
+      padding: 14px;
+    }
+    .workflow-ui .source-subsection {
       grid-column: 1 / -1;
-      margin: 14px 0;
+      margin: 0;
       padding: 0 14px 14px;
       border: 1px solid #dbeafe;
       border-radius: 14px;
       background: #f8fafc;
     }
-    .source-subsection > summary {
-      margin: 0 0 12px;
+    .workflow-ui .source-subsection > summary {
       cursor: pointer;
     }
-    .source-hint {
+    .workflow-ui .source-hint {
       grid-column: 1 / -1;
       margin: 8px 0 0;
       padding: 12px;
@@ -95,10 +173,82 @@ function ensureStyles() {
       margin-top: 0;
     }
     .workflow-ui #wgfzBlock {
+      margin-top: 0;
+    }
+    .workflow-ui #wgfzBlock .grid.three,
+    .workflow-ui .unit-card .grid.three {
+      gap: 12px;
+    }
+    .workflow-ui .hint {
       margin-top: 10px;
+      padding: 14px;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .info-tooltip {
+      width: 17px;
+      height: 17px;
+      min-width: 17px;
+      min-height: 17px;
+      font-size: 11px;
+      line-height: 17px;
+      vertical-align: middle;
     }
   `;
   document.head.appendChild(style);
+}
+
+function normalizeTextNode(node) {
+  const text = node.textContent.replace(/\s+/g, ' ').trim();
+  if (!text) return null;
+  return document.createTextNode(`${text} `);
+}
+
+function normalizeLabelTitles(root = document) {
+  root.querySelectorAll('label').forEach((label) => {
+    if (label.dataset.titleNormalized === '1') return;
+
+    const control = Array.from(label.children).find((child) =>
+      child.matches?.('input, select, textarea'),
+    );
+    if (!control) return;
+
+    const titleNodes = [];
+    Array.from(label.childNodes).some((node) => {
+      if (node === control) return true;
+      if (node.nodeType === Node.TEXT_NODE) {
+        const textNode = normalizeTextNode(node);
+        if (textNode) titleNodes.push(textNode);
+        node.remove();
+        return false;
+      }
+      if (node.nodeType === Node.ELEMENT_NODE && node.classList?.contains('info-tooltip')) {
+        titleNodes.push(node);
+        return false;
+      }
+      return false;
+    });
+
+    if (!titleNodes.length) {
+      label.dataset.titleNormalized = '1';
+      return;
+    }
+
+    const title = document.createElement('div');
+    title.className = 'field-title';
+    titleNodes.forEach((node) => title.appendChild(node));
+    label.insertBefore(title, control);
+    label.dataset.titleNormalized = '1';
+  });
+}
+
+function installLabelNormalizer() {
+  if (window.__workflowLabelNormalizerInstalled) return;
+  window.__workflowLabelNormalizerInstalled = true;
+
+  const observer = new MutationObserver(() => normalizeLabelTitles(document));
+  observer.observe(document.documentElement, { childList: true, subtree: true });
+  normalizeLabelTitles(document);
 }
 
 function createSection(id, title, summaryText = '–') {
@@ -334,6 +484,7 @@ function buildWorkflow() {
   form.classList.add('workflow-ui');
   ensureStyles();
   setVersionLabel();
+  normalizeLabelTitles(form);
 
   const objectSection = $('objectName')?.closest('details.section');
   const landSection = $('baseLandValuePerSqm')?.closest('details.section') || $('plotArea')?.closest('details.section');
@@ -343,6 +494,7 @@ function buildWorkflow() {
   placeObjectAndUnits(objectSection, incomeSection);
   placeBrwSection(form, landSection);
   placeLandValueSection(landSection);
+  installLabelNormalizer();
   installWorkflowEvents();
   updateWorkflowSummaries();
 
@@ -350,12 +502,12 @@ function buildWorkflow() {
 }
 
 function scheduleWorkflowBuild() {
-  [0, 100, 300, 700, 1500, 3000].forEach((delay) => {
+  [0, 100, 300, 700, 1500, 2500, 5000].forEach((delay) => {
     window.setTimeout(buildWorkflow, delay);
   });
 
   document.addEventListener('DOMContentLoaded', () => {
-    [0, 100, 300, 700, 1500, 3000].forEach((delay) => {
+    [0, 100, 300, 700, 1500, 2500, 5000].forEach((delay) => {
       window.setTimeout(buildWorkflow, delay);
     });
   });
