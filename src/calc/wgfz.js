@@ -3,6 +3,7 @@ import '../ui/brw-model.js';
 import '../ui/date-model.js';
 import '../ui/generic-land-model.js';
 import '../ui/object-area-model.js';
+import '../ui/app-version.js';
 
 export const WGFZ_MODELS = Object.freeze({
   LOWRISE: 'lowrise',
